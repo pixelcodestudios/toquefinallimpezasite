@@ -1,0 +1,2396 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Toque Final Limpeza — Painel Administrativo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================================
+   TOQUE FINAL LIMPEZA — Estilos
+   Paleta: verde-jade (identidade/limpeza), âmbar (destaques),
+   fundo neutro claro. Tipografia: Sora (títulos) + Plus Jakarta Sans (texto).
+   ========================================================================== */
+
+:root {
+  --jade-900: #0b3d3a;
+  --jade-800: #0f4f4a;
+  --jade-700: #0d6b62;
+  --jade-600: #0d9488;
+  --jade-500: #14b8a6;
+  --jade-100: #e6f5f3;
+  --jade-50:  #f2faf9;
+
+  --ambar-500: #f59e0b;
+  --ambar-600: #d97706;
+
+  --tinta-900: #0f172a;
+  --tinta-700: #334155;
+  --tinta-500: #64748b;
+  --tinta-300: #cbd5e1;
+  --tinta-100: #eef2f6;
+
+  --vermelho: #dc2626;
+  --vermelho-bg: #fef2f2;
+  --verde-bg: #ecfdf5;
+  --verde-txt: #047857;
+  --amarelo-bg: #fffbeb;
+  --amarelo-txt: #b45309;
+  --azul-bg: #eff6ff;
+  --azul-txt: #1d4ed8;
+  --cinza-bg: #f1f5f9;
+  --cinza-txt: #475569;
+
+  --fundo: #f7f9fa;
+  --superficie: #ffffff;
+  --borda: #e4e9ed;
+
+  --raio: 14px;
+  --raio-sm: 9px;
+  --sombra: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px -12px rgba(15, 23, 42, 0.10);
+  --sombra-modal: 0 20px 60px -12px rgba(11, 61, 58, 0.35);
+
+  --fonte-titulo: 'Sora', sans-serif;
+  --fonte-texto: 'Plus Jakarta Sans', sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--fundo);
+  color: var(--tinta-900);
+  font-family: var(--fonte-texto);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { font-family: var(--fonte-titulo); margin: 0; color: var(--jade-900); }
+p { margin: 0; }
+button { font-family: inherit; cursor: pointer; }
+input, select, textarea { font-family: inherit; }
+a { color: inherit; text-decoration: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+/* ---------------- Logo ---------------- */
+
+.logo { display: flex; align-items: center; gap: 12px; }
+.logo__icone {
+  width: 40px; height: 40px; border-radius: 11px;
+  background: linear-gradient(145deg, var(--jade-600), var(--jade-800));
+  color: #fff; display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+  box-shadow: 0 6px 14px -4px rgba(13, 148, 136, 0.55);
+}
+.logo__texto { display: flex; flex-direction: column; line-height: 1.25; }
+.logo__texto strong { font-family: var(--fonte-titulo); font-size: 16px; color: var(--jade-900); }
+.logo__texto span { font-size: 12px; color: var(--tinta-500); }
+
+/* ---------------- Menu lateral (desktop) ---------------- */
+
+.menu-lateral {
+  position: fixed; top: 0; left: 0; bottom: 0; width: 264px;
+  background: var(--superficie); border-right: 1px solid var(--borda);
+  display: flex; flex-direction: column; z-index: 40;
+  transition: transform 0.25s ease;
+}
+.menu-lateral__topo { padding: 22px 20px 18px; border-bottom: 1px solid var(--borda); }
+.menu-lateral__nav { flex: 1; padding: 14px 12px; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; }
+
+.nav-link {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 14px; border-radius: var(--raio-sm);
+  color: var(--tinta-700); font-weight: 500; font-size: 14.5px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.nav-link__icone { font-size: 17px; width: 20px; text-align: center; }
+.nav-link:hover { background: var(--jade-50); color: var(--jade-800); }
+.nav-link--ativo { background: var(--jade-100); color: var(--jade-800); font-weight: 700; }
+
+.menu-lateral__rodape {
+  padding: 16px 20px; border-top: 1px solid var(--borda);
+  font-size: 12px; color: var(--tinta-500); line-height: 1.4;
+}
+
+.overlay-menu {
+  display: none; position: fixed; inset: 0; background: rgba(11, 61, 58, 0.45);
+  z-index: 35; opacity: 0; transition: opacity 0.2s ease;
+}
+.overlay-menu--visivel { display: block; opacity: 1; }
+
+/* ---------------- Conteúdo principal ---------------- */
+
+.conteudo-principal { margin-left: 264px; min-height: 100vh; }
+
+.cabecalho-mobile { display: none; }
+
+.area-secoes { max-width: 1180px; margin: 0 auto; padding: 32px 32px 90px; }
+
+.secao { display: none; animation: entrada 0.25s ease; }
+.secao--ativa { display: block; }
+
+@keyframes entrada { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+.secao__cabecalho {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap; margin-bottom: 22px;
+}
+.secao__cabecalho h1 { font-size: 26px; }
+.secao__subtitulo { color: var(--tinta-500); font-size: 14px; margin-top: 4px; }
+
+/* ---------------- Botões ---------------- */
+
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 11px 18px; border-radius: 10px; border: none;
+  font-weight: 600; font-size: 14px; transition: transform 0.1s ease, box-shadow 0.15s ease, background 0.15s ease;
+  white-space: nowrap;
+}
+.btn:active { transform: scale(0.97); }
+.btn--primario { background: var(--jade-700); color: #fff; box-shadow: 0 6px 16px -6px rgba(13, 148, 136, 0.55); }
+.btn--primario:hover { background: var(--jade-800); }
+.btn--secundario { background: var(--tinta-100); color: var(--tinta-700); }
+.btn--secundario:hover { background: var(--borda); }
+.btn--perigo { background: var(--vermelho); color: #fff; }
+.btn--perigo:hover { background: #b91c1c; }
+
+.btn-icone {
+  width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--borda);
+  background: var(--superficie); display: inline-flex; align-items: center; justify-content: center;
+  font-size: 14px; color: var(--tinta-700); transition: background 0.15s ease, border-color 0.15s ease;
+}
+.btn-icone:hover { background: var(--jade-50); border-color: var(--jade-500); }
+.btn-icone--perigo:hover { background: var(--vermelho-bg); border-color: var(--vermelho); color: var(--vermelho); }
+
+.btn-icone-menu {
+  background: none; border: none; font-size: 22px; color: var(--jade-900); padding: 4px 8px;
+}
+
+/* ---------------- Cards de indicadores ---------------- */
+
+.grid-cards {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px;
+}
+.grid-cards--tres { grid-template-columns: repeat(3, 1fr); }
+
+.card-indicador {
+  background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio);
+  padding: 18px 20px; display: flex; flex-direction: column; gap: 8px; box-shadow: var(--sombra);
+}
+.card-indicador__rotulo { font-size: 13px; color: var(--tinta-500); font-weight: 500; }
+.card-indicador__valor { font-family: var(--fonte-titulo); font-size: 24px; font-weight: 700; color: var(--jade-900); }
+.card-indicador--destaque {
+  background: linear-gradient(145deg, var(--jade-700), var(--jade-900));
+  border: none;
+}
+.card-indicador--destaque .card-indicador__rotulo { color: rgba(255,255,255,0.75); }
+.card-indicador--destaque .card-indicador__valor { color: #fff; }
+
+.valor--negativo { color: var(--vermelho) !important; }
+
+/* ---------------- Painéis / grid duas colunas ---------------- */
+
+.grid-duas-colunas { display: grid; grid-template-columns: 1.3fr 1fr; gap: 18px; margin-bottom: 18px; }
+
+.painel {
+  background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio);
+  padding: 20px; box-shadow: var(--sombra);
+}
+.painel__titulo { font-size: 16px; margin-bottom: 14px; }
+
+#grafico-faturamento { width: 100%; display: block; }
+
+/* ---------------- Próximos serviços (dashboard) ---------------- */
+
+.item-proximo-servico {
+  display: grid; grid-template-columns: 56px 1fr auto; align-items: center; gap: 12px;
+  padding: 10px 8px; border-bottom: 1px solid var(--tinta-100);
+}
+.item-proximo-servico:last-child { border-bottom: none; }
+.item-proximo-servico__data { display: flex; flex-direction: column; font-size: 12.5px; color: var(--tinta-500); font-weight: 600; }
+.item-proximo-servico__hora { font-weight: 400; }
+.item-proximo-servico__info { display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
+.item-proximo-servico__valor { font-weight: 700; color: var(--jade-800); font-size: 14px; }
+
+/* ---------------- Barra de filtros ---------------- */
+
+.barra-filtros { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+
+.campo-busca, .campo-mes {
+  padding: 10px 14px; border-radius: 9px; border: 1px solid var(--borda);
+  background: var(--superficie); font-size: 14px; color: var(--tinta-900);
+}
+.campo-busca { min-width: 260px; flex: 1; max-width: 340px; }
+.campo-busca:focus, .campo-mes:focus { outline: 2px solid var(--jade-500); outline-offset: 1px; }
+
+.chip {
+  padding: 8px 16px; border-radius: 999px; border: 1px solid var(--borda);
+  background: var(--superficie); font-size: 13.5px; font-weight: 600; color: var(--tinta-700);
+  transition: all 0.15s ease;
+}
+.chip:hover { border-color: var(--jade-500); }
+.chip--ativo { background: var(--jade-700); border-color: var(--jade-700); color: #fff; }
+
+/* ---------------- Tabelas ---------------- */
+
+.tabela-wrap {
+  background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio);
+  overflow: hidden; box-shadow: var(--sombra);
+}
+.tabela { width: 100%; border-collapse: collapse; }
+.tabela thead th {
+  text-align: left; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.03em;
+  color: var(--tinta-500); font-weight: 700; padding: 13px 16px; background: var(--jade-50);
+  border-bottom: 1px solid var(--borda);
+}
+.tabela tbody td { padding: 13px 16px; font-size: 14px; border-bottom: 1px solid var(--tinta-100); }
+.tabela tbody tr:last-child td { border-bottom: none; }
+.tabela tbody tr:hover { background: var(--jade-50); }
+.tabela__acoes { display: flex; gap: 6px; justify-content: flex-end; }
+
+/* ---------------- Badges (status) ---------------- */
+
+.badge {
+  display: inline-flex; align-items: center; padding: 4px 11px; border-radius: 999px;
+  font-size: 12px; font-weight: 700;
+}
+.badge--verde { background: var(--verde-bg); color: var(--verde-txt); }
+.badge--vermelho { background: var(--vermelho-bg); color: var(--vermelho); }
+.badge--amarelo { background: var(--amarelo-bg); color: var(--amarelo-txt); }
+.badge--azul { background: var(--azul-bg); color: var(--azul-txt); }
+.badge--cinza { background: var(--cinza-bg); color: var(--cinza-txt); }
+
+/* ---------------- Estados vazios ---------------- */
+
+.estado-vazio {
+  background: var(--superficie); border: 1px dashed var(--tinta-300); border-radius: var(--raio);
+  padding: 50px 24px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px;
+}
+.estado-vazio__icone { font-size: 34px; margin-bottom: 6px; }
+.estado-vazio h3 { font-size: 17px; }
+.estado-vazio p { color: var(--tinta-500); font-size: 14px; max-width: 340px; }
+.estado-vazio .btn { margin-top: 14px; }
+.estado-vazio--compacto { padding: 26px 16px; border-style: solid; }
+
+.texto-fraco { color: var(--tinta-500); font-size: 13px; margin-bottom: 10px; }
+
+/* ---------------- Formulários ---------------- */
+
+.painel--formulario form { display: flex; flex-direction: column; gap: 14px; }
+
+.grid-formulario { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.campo { display: flex; flex-direction: column; gap: 6px; }
+.campo--largo { grid-column: 1 / -1; }
+
+.campo label { font-size: 13px; font-weight: 600; color: var(--tinta-700); }
+.campo input, .campo select, .campo textarea {
+  padding: 10px 13px; border-radius: 9px; border: 1px solid var(--borda);
+  font-size: 14px; color: var(--tinta-900); background: var(--superficie); width: 100%;
+}
+.campo input:focus, .campo select:focus, .campo textarea:focus {
+  outline: 2px solid var(--jade-500); outline-offset: 1px; border-color: var(--jade-500);
+}
+.campo textarea { resize: vertical; min-height: 60px; }
+
+/* ---------------- Aviso ---------------- */
+
+.aviso {
+  display: none; align-items: center; gap: 8px; background: var(--amarelo-bg); color: var(--amarelo-txt);
+  border: 1px solid #fcd34d; border-radius: var(--raio-sm); padding: 12px 16px; font-size: 13.5px; margin-bottom: 18px;
+}
+.aviso .link { font-weight: 700; text-decoration: underline; }
+
+/* ---------------- Orçamento: resultado ---------------- */
+
+.card-resultado-orcamento {
+  margin-top: 18px; background: linear-gradient(145deg, var(--jade-700), var(--jade-900));
+  color: #fff; border-radius: var(--raio); padding: 26px; display: flex; flex-direction: column; gap: 10px;
+}
+.card-resultado-orcamento__rotulo { font-size: 13px; opacity: 0.8; }
+.card-resultado-orcamento__valor { font-family: var(--fonte-titulo); font-size: 34px; font-weight: 800; }
+.card-resultado-orcamento__detalhes { margin-top: 8px; font-size: 13.5px; opacity: 0.9; display: flex; flex-direction: column; gap: 3px; }
+
+/* ---------------- Relatórios ---------------- */
+
+.grid-relatorio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.card-relatorio {
+  background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio);
+  padding: 16px 18px; display: flex; align-items: center; gap: 14px; box-shadow: var(--sombra);
+}
+.card-relatorio__icone { font-size: 24px; }
+.card-relatorio__titulo { display: block; font-size: 12.5px; color: var(--tinta-500); font-weight: 600; }
+.card-relatorio__valor { display: block; font-family: var(--fonte-titulo); font-size: 20px; font-weight: 700; color: var(--jade-900); }
+
+/* ---------------- Tags (categorias) ---------------- */
+
+.linha-adicionar-tag { display: flex; gap: 8px; margin-bottom: 14px; }
+.linha-adicionar-tag input {
+  flex: 1; padding: 10px 13px; border-radius: 9px; border: 1px solid var(--borda); font-size: 14px;
+}
+.lista-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.tag {
+  display: inline-flex; align-items: center; gap: 6px; background: var(--jade-100); color: var(--jade-800);
+  padding: 6px 8px 6px 13px; border-radius: 999px; font-size: 13px; font-weight: 600;
+}
+.tag__remover {
+  width: 18px; height: 18px; border: none; background: rgba(11,61,58,0.12); color: var(--jade-800);
+  border-radius: 50%; font-size: 13px; line-height: 1; display: flex; align-items: center; justify-content: center;
+}
+.tag__remover:hover { background: var(--vermelho); color: #fff; }
+
+/* ---------------- Detalhes (lista de definição) ---------------- */
+
+.lista-detalhes { display: grid; grid-template-columns: 150px 1fr; row-gap: 12px; column-gap: 12px; margin: 4px 0 0; }
+.lista-detalhes dt { font-size: 13px; color: var(--tinta-500); font-weight: 600; }
+.lista-detalhes dd { margin: 0; font-size: 14px; }
+
+/* ---------------- Toasts ---------------- */
+
+.toast-container {
+  position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+  z-index: 90; display: flex; flex-direction: column; gap: 8px; align-items: center; width: min(92vw, 380px);
+}
+.toast {
+  display: flex; align-items: center; gap: 10px; background: var(--jade-900); color: #fff;
+  padding: 12px 18px; border-radius: 10px; font-size: 14px; font-weight: 500;
+  box-shadow: 0 12px 28px -8px rgba(0,0,0,0.35);
+  opacity: 0; transform: translateY(10px); transition: opacity 0.25s ease, transform 0.25s ease;
+  width: 100%;
+}
+.toast--visivel { opacity: 1; transform: translateY(0); }
+.toast--erro { background: var(--vermelho); }
+.toast__icone { font-weight: 800; }
+
+/* ---------------- Modais ---------------- */
+
+.modal {
+  display: none; position: fixed; inset: 0; z-index: 80; align-items: flex-start; justify-content: center;
+  background: rgba(11, 61, 58, 0.45); padding: 24px 16px; overflow-y: auto;
+}
+.modal--aberto { display: flex; animation: fundoModal 0.15s ease; }
+@keyframes fundoModal { from { opacity: 0; } to { opacity: 1; } }
+
+.modal__caixa {
+  background: var(--superficie); border-radius: 18px; padding: 24px; width: 100%; max-width: 620px;
+  margin-top: 30px; box-shadow: var(--sombra-modal); animation: subirModal 0.2s ease;
+}
+.modal__caixa--pequena { max-width: 400px; }
+@keyframes subirModal { from { opacity: 0; transform: translateY(14px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+.modal__cabecalho { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.modal__cabecalho h3 { font-size: 18px; }
+.modal__fechar { background: none; border: none; font-size: 22px; color: var(--tinta-500); line-height: 1; padding: 4px; }
+.modal__fechar:hover { color: var(--tinta-900); }
+.modal__titulo { font-size: 18px; margin-bottom: 8px; }
+.modal__descricao { color: var(--tinta-500); font-size: 14px; margin-bottom: 20px; }
+.modal__acoes { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }
+
+/* ---------------- Menu inferior mobile ---------------- */
+
+.menu-inferior-mobile { display: none; }
+
+/* ==========================================================================
+   RESPONSIVO — MOBILE (mobile-first adjustments para telas menores)
+   ========================================================================== */
+
+@media (max-width: 980px) {
+  .menu-lateral { transform: translateX(-100%); box-shadow: 0 0 40px rgba(0,0,0,0.2); }
+  .menu-lateral--aberto { transform: translateX(0); }
+
+  .conteudo-principal { margin-left: 0; }
+
+  .cabecalho-mobile {
+    display: flex; align-items: center; gap: 12px; padding: 14px 16px;
+    background: var(--superficie); border-bottom: 1px solid var(--borda);
+    position: sticky; top: 0; z-index: 20;
+  }
+  .cabecalho-mobile__logo { display: flex; align-items: center; gap: 10px; }
+  .cabecalho-mobile__logo strong { font-family: var(--fonte-titulo); font-size: 15px; color: var(--jade-900); }
+  .cabecalho-mobile .logo__icone { width: 30px; height: 30px; font-size: 14px; border-radius: 8px; }
+
+  .area-secoes { padding: 20px 16px 100px; }
+
+  .grid-cards, .grid-cards--tres { grid-template-columns: 1fr 1fr; }
+  .grid-duas-colunas { grid-template-columns: 1fr; }
+  .grid-formulario { grid-template-columns: 1fr; }
+  .grid-relatorio { grid-template-columns: 1fr 1fr; }
+
+  .secao__cabecalho h1 { font-size: 21px; }
+
+  /* Tabelas viram "cartões" empilhados no celular */
+  .tabela thead { display: none; }
+  .tabela, .tabela tbody, .tabela tbody tr, .tabela tbody td { display: block; width: 100%; }
+  .tabela tbody tr {
+    padding: 12px 16px; border-bottom: 1px solid var(--borda);
+  }
+  .tabela tbody td {
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    padding: 7px 0; border-bottom: none; text-align: right;
+  }
+  .tabela tbody td[data-rotulo]::before {
+    content: attr(data-rotulo); font-size: 12px; font-weight: 700; color: var(--tinta-500); text-align: left;
+  }
+  .tabela__acoes { justify-content: flex-end; padding-top: 8px !important; }
+
+  .menu-inferior-mobile {
+    display: flex; position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+    background: var(--superficie); border-top: 1px solid var(--borda);
+    padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+  }
+  .menu-inferior-mobile .nav-link {
+    flex: 1; flex-direction: column; gap: 2px; padding: 6px 2px; border-radius: 10px;
+    font-size: 10.5px; text-align: center; color: var(--tinta-500);
+  }
+  .menu-inferior-mobile .nav-link span { font-size: 18px; }
+  .menu-inferior-mobile .nav-link--ativo { background: transparent; color: var(--jade-700); }
+
+  .toast-container { bottom: 78px; }
+}
+
+@media (max-width: 560px) {
+  .grid-cards, .grid-cards--tres, .grid-relatorio { grid-template-columns: 1fr; }
+  .modal__caixa { padding: 18px; margin-top: 14px; }
+  .lista-detalhes { grid-template-columns: 120px 1fr; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ===================== OVERLAY DO MENU MOBILE ===================== -->
+<div id="overlay-menu" class="overlay-menu"></div>
+
+<!-- ===================== MENU LATERAL ===================== -->
+<aside id="menu-lateral" class="menu-lateral">
+  <div class="menu-lateral__topo">
+    <div class="logo">
+      <span class="logo__icone">✦</span>
+      <div class="logo__texto">
+        <strong class="js-nome-empresa">Toque Final Limpeza</strong>
+        <span>Painel administrativo</span>
+      </div>
+    </div>
+  </div>
+
+  <nav class="menu-lateral__nav">
+    <a href="#dashboard" class="nav-link" data-secao="dashboard"><span class="nav-link__icone">🏠</span>Dashboard</a>
+    <a href="#clientes" class="nav-link" data-secao="clientes"><span class="nav-link__icone">👥</span>Clientes</a>
+    <a href="#servicos" class="nav-link" data-secao="servicos"><span class="nav-link__icone">📅</span>Serviços / Agenda</a>
+    <a href="#funcionarios" class="nav-link" data-secao="funcionarios"><span class="nav-link__icone">🧑‍🤝‍🧑</span>Funcionários</a>
+    <a href="#financeiro" class="nav-link" data-secao="financeiro"><span class="nav-link__icone">💰</span>Financeiro</a>
+    <a href="#orcamento" class="nav-link" data-secao="orcamento"><span class="nav-link__icone">🧮</span>Orçamento</a>
+    <a href="#relatorios" class="nav-link" data-secao="relatorios"><span class="nav-link__icone">📊</span>Relatórios</a>
+    <a href="#configuracoes" class="nav-link" data-secao="configuracoes"><span class="nav-link__icone">⚙️</span>Configurações</a>
+  </nav>
+
+  <div class="menu-lateral__rodape">
+    <span>Todos os dados ficam salvos neste navegador.</span>
+  </div>
+</aside>
+
+<!-- ===================== CONTEÚDO PRINCIPAL ===================== -->
+<div class="conteudo-principal">
+
+  <!-- Cabeçalho mobile -->
+  <header class="cabecalho-mobile">
+    <button id="btn-abrir-menu" class="btn-icone-menu" aria-label="Abrir menu">☰</button>
+    <div class="cabecalho-mobile__logo">
+      <span class="logo__icone">✦</span>
+      <strong class="js-nome-empresa">Toque Final Limpeza</strong>
+    </div>
+  </header>
+
+  <main class="area-secoes">
+
+    <!-- ===================== DASHBOARD ===================== -->
+    <section id="secao-dashboard" class="secao">
+      <div class="secao__cabecalho">
+        <div>
+          <h1>Dashboard</h1>
+          <p class="secao__subtitulo">Visão geral do mês atual</p>
+        </div>
+      </div>
+
+      <div class="grid-cards">
+        <div class="card-indicador">
+          <span class="card-indicador__rotulo">Faturamento do mês</span>
+          <span id="dash-faturamento" class="card-indicador__valor">R$ 0,00</span>
+        </div>
+        <div class="card-indicador">
+          <span class="card-indicador__rotulo">Despesas do mês</span>
+          <span id="dash-despesas" class="card-indicador__valor">R$ 0,00</span>
+        </div>
+        <div class="card-indicador card-indicador--destaque">
+          <span class="card-indicador__rotulo">Lucro estimado</span>
+          <span id="dash-lucro" class="card-indicador__valor">R$ 0,00</span>
+        </div>
+        <div class="card-indicador">
+          <span class="card-indicador__rotulo">Clientes ativos</span>
+          <span id="dash-clientes" class="card-indicador__valor">0</span>
+        </div>
+        <div class="card-indicador">
+          <span class="card-indicador__rotulo">Serviços concluídos (mês)</span>
+          <span id="dash-concluidos" class="card-indicador__valor">0</span>
+        </div>
+        <div class="card-indicador">
+          <span class="card-indicador__rotulo">Serviços pendentes</span>
+          <span id="dash-pendentes" class="card-indicador__valor">0</span>
+        </div>
+      </div>
+
+      <div class="grid-duas-colunas">
+        <div class="painel">
+          <h2 class="painel__titulo">Faturamento — últimos 6 meses</h2>
+          <canvas id="grafico-faturamento"></canvas>
+        </div>
+
+        <div class="painel">
+          <h2 class="painel__titulo">Próximos serviços</h2>
+          <div id="dash-proximos-servicos"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== CLIENTES ===================== -->
+    <section id="secao-clientes" class="secao">
+      <div class="secao__cabecalho">
+        <div>
+          <h1>Clientes</h1>
+          <p id="contador-clientes" class="secao__subtitulo">0 clientes cadastrados</p>
+        </div>
+        <button class="btn btn--primario" onclick="Clientes.abrirFormulario()">+ Adicionar cliente</button>
+      </div>
+
+      <div class="barra-filtros">
+        <input type="search" class="campo-busca" placeholder="Buscar por nome ou telefone..." oninput="Clientes.buscar(this.value)">
+      </div>
+
+      <div id="lista-clientes"></div>
+    </section>
+
+    <!-- ===================== SERVIÇOS / AGENDA ===================== -->
+    <section id="secao-servicos" class="secao">
+      <div class="secao__cabecalho">
+        <div>
+          <h1>Serviços / Agenda</h1>
+          <p class="secao__subtitulo">Controle os serviços agendados, concluídos e cancelados</p>
+        </div>
+        <button class="btn btn--primario" onclick="Servicos.abrirFormulario()">+ Agendar serviço</button>
+      </div>
+
+      <div class="barra-filtros">
+        <button class="chip chip--ativo filtro-status-servico" data-status="todos" onclick="Servicos.filtrar('todos')">Todos</button>
+        <button class="chip filtro-status-servico" data-status="Agendado" onclick="Servicos.filtrar('Agendado')">Agendados</button>
+        <button class="chip filtro-status-servico" data-status="Pendente" onclick="Servicos.filtrar('Pendente')">Pendentes</button>
+        <button class="chip filtro-status-servico" data-status="Concluído" onclick="Servicos.filtrar('Concluído')">Concluídos</button>
+        <button class="chip filtro-status-servico" data-status="Cancelado" onclick="Servicos.filtrar('Cancelado')">Cancelados</button>
+      </div>
+
+      <div id="lista-servicos"></div>
+    </section>
+
+    <!-- ===================== FUNCIONÁRIOS ===================== -->
+    <section id="secao-funcionarios" class="secao">
+      <div class="secao__cabecalho">
+        <div>
+          <h1>Funcionários</h1>
+          <p class="secao__subtitulo">Equipe de limpeza</p>
+        </div>
+        <button class="btn btn--primario" onclick="Funcionarios.abrirFormulario()">+ Adicionar funcionário</button>
+      </div>
+
+      <div id="lista-funcionarios"></div>
+    </section>
+
+    <!-- ===================== FINANCEIRO ===================== -->
+    <section id="secao-financeiro" class="secao">
+      <div class="secao__cabecalho">
+        <div>
+          <h1>Financeiro</h1>
+          <p class="secao__subtitulo">Receitas, despesas e lucro</p>
+        </div>
+        <button class="btn btn--primario" onclick="Financeiro.abrirFormulario()">+ Nova movimentação</button>
+      </div>
+
+      <div class="grid-cards grid-cards--tres">
+        <div class="card-indicador">
+          <span class="card-indicador__rotulo">Receitas do mês</span>
+          <span id="financeiro-total-receitas" class="card-indicador__valor">R$ 0,00</span>
+        </div>
+        <div class="card-indicador">
+          <span class="card-indicador__rotulo">Despesas do mês</span>
+          <span id="financeiro-total-despesas" class="card-indicador__valor">R$ 0,00</span>
+        </div>
+        <div class="card-indicador card-indicador--destaque">
+          <span class="card-indicador__rotulo">Lucro do mês</span>
+          <span id="financeiro-lucro" class="card-indicador__valor">R$ 0,00</span>
+        </div>
+      </div>
+
+      <div class="barra-filtros">
+        <input type="month" id="financeiro-filtro-mes" class="campo-mes" onchange="Financeiro.filtrarMes(this.value)">
+        <button class="chip chip--ativo filtro-tipo-financeiro" data-tipo="todos" onclick="Financeiro.filtrarTipo('todos')">Todos</button>
+        <button class="chip filtro-tipo-financeiro" data-tipo="Receita" onclick="Financeiro.filtrarTipo('Receita')">Receitas</button>
+        <button class="chip filtro-tipo-financeiro" data-tipo="Despesa" onclick="Financeiro.filtrarTipo('Despesa')">Despesas</button>
+      </div>
+
+      <div id="lista-financeiro"></div>
+    </section>
+
+    <!-- ===================== ORÇAMENTO ===================== -->
+    <section id="secao-orcamento" class="secao">
+      <div class="secao__cabecalho">
+        <div>
+          <h1>Orçamento</h1>
+          <p class="secao__subtitulo">Calculadora para gerar uma sugestão de valor</p>
+        </div>
+      </div>
+
+      <div id="orcamento-aviso-precos" class="aviso"></div>
+
+      <div class="painel painel--formulario">
+        <form id="form-orcamento" onsubmit="Orcamento.calcular(event)">
+          <div class="grid-formulario">
+            <div class="campo">
+              <label for="orc-tipo-imovel">Tipo de imóvel</label>
+              <select id="orc-tipo-imovel">
+                <option>Casa</option>
+                <option>Apartamento</option>
+                <option>Comercial</option>
+                <option>Outro</option>
+              </select>
+            </div>
+            <div class="campo">
+              <label for="orc-tamanho">Tamanho aproximado (m²)</label>
+              <input type="number" id="orc-tamanho" min="0" step="0.1" placeholder="Ex: 80">
+            </div>
+            <div class="campo">
+              <label for="orc-comodos">Quantidade de cômodos</label>
+              <input type="number" id="orc-comodos" min="0" step="1" placeholder="Ex: 4">
+            </div>
+            <div class="campo">
+              <label for="orc-banheiros">Quantidade de banheiros</label>
+              <input type="number" id="orc-banheiros" min="0" step="1" placeholder="Ex: 2">
+            </div>
+            <div class="campo">
+              <label for="orc-tipo-limpeza">Tipo de limpeza</label>
+              <select id="orc-tipo-limpeza">
+                <option value="padrao">Padrão</option>
+                <option value="pesada">Pesada</option>
+                <option value="pos_obra">Pós-obra</option>
+              </select>
+            </div>
+          </div>
+          <div class="campo">
+            <label for="orc-observacoes">Observações</label>
+            <textarea id="orc-observacoes" rows="2" placeholder="Detalhes adicionais sobre o imóvel ou o serviço"></textarea>
+          </div>
+          <button type="submit" class="btn btn--primario">Calcular orçamento</button>
+        </form>
+      </div>
+
+      <div id="resultado-orcamento"></div>
+    </section>
+
+    <!-- ===================== RELATÓRIOS ===================== -->
+    <section id="secao-relatorios" class="secao">
+      <div class="secao__cabecalho">
+        <div>
+          <h1>Relatórios</h1>
+          <p class="secao__subtitulo">Resumo mensal do negócio</p>
+        </div>
+      </div>
+
+      <div class="barra-filtros">
+        <input type="month" id="relatorio-filtro-mes" class="campo-mes" onchange="Relatorios.filtrarMes(this.value)">
+      </div>
+
+      <div id="relatorio-grid" class="grid-relatorio"></div>
+    </section>
+
+    <!-- ===================== CONFIGURAÇÕES ===================== -->
+    <section id="secao-configuracoes" class="secao">
+      <div class="secao__cabecalho">
+        <div>
+          <h1>Configurações</h1>
+          <p class="secao__subtitulo">Dados da empresa, preços e categorias</p>
+        </div>
+      </div>
+
+      <div class="grid-duas-colunas">
+        <div class="painel painel--formulario">
+          <h2 class="painel__titulo">Dados da empresa</h2>
+          <form id="form-config-empresa" onsubmit="Configuracoes.salvarEmpresa(event)">
+            <div class="campo">
+              <label for="config-nome-empresa">Nome da empresa</label>
+              <input type="text" id="config-nome-empresa" required>
+            </div>
+            <div class="campo">
+              <label for="config-telefone">Telefone</label>
+              <input type="tel" id="config-telefone" placeholder="(00) 00000-0000">
+            </div>
+            <div class="campo">
+              <label for="config-endereco">Endereço</label>
+              <input type="text" id="config-endereco">
+            </div>
+            <button type="submit" class="btn btn--primario">Salvar dados da empresa</button>
+          </form>
+        </div>
+
+        <div class="painel painel--formulario">
+          <h2 class="painel__titulo">Preços usados no orçamento</h2>
+          <p class="texto-fraco">Preencha ao menos um preço-base. Deixe em branco o que não usar.</p>
+          <form id="form-config-precos" onsubmit="Configuracoes.salvarPrecos(event)">
+            <div class="grid-formulario">
+              <div class="campo">
+                <label for="config-preco-m2">Valor por m² (R$)</label>
+                <input type="number" id="config-preco-m2" min="0" step="0.01">
+              </div>
+              <div class="campo">
+                <label for="config-preco-comodo">Valor por cômodo (R$)</label>
+                <input type="number" id="config-preco-comodo" min="0" step="0.01">
+              </div>
+              <div class="campo">
+                <label for="config-preco-banheiro">Valor por banheiro (R$)</label>
+                <input type="number" id="config-preco-banheiro" min="0" step="0.01">
+              </div>
+              <div class="campo">
+                <label for="config-mult-pesada">Multiplicador — limpeza pesada</label>
+                <input type="number" id="config-mult-pesada" min="1" step="0.1">
+              </div>
+              <div class="campo">
+                <label for="config-mult-pos-obra">Multiplicador — pós-obra</label>
+                <input type="number" id="config-mult-pos-obra" min="1" step="0.1">
+              </div>
+            </div>
+            <button type="submit" class="btn btn--primario">Salvar preços</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="grid-duas-colunas">
+        <div class="painel">
+          <h2 class="painel__titulo">Categorias de receitas</h2>
+          <div class="linha-adicionar-tag">
+            <input type="text" id="nova-categoria-receita" placeholder="Nova categoria de receita">
+            <button class="btn btn--secundario" onclick="Configuracoes.adicionarCategoria('categoriasReceitas', 'nova-categoria-receita')">Adicionar</button>
+          </div>
+          <div id="lista-categorias-receitas" class="lista-tags"></div>
+        </div>
+
+        <div class="painel">
+          <h2 class="painel__titulo">Categorias de despesas</h2>
+          <div class="linha-adicionar-tag">
+            <input type="text" id="nova-categoria-despesa" placeholder="Nova categoria de despesa">
+            <button class="btn btn--secundario" onclick="Configuracoes.adicionarCategoria('categoriasDespesas', 'nova-categoria-despesa')">Adicionar</button>
+          </div>
+          <div id="lista-categorias-despesas" class="lista-tags"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ===================== MENU INFERIOR MOBILE ===================== -->
+<nav class="menu-inferior-mobile">
+  <a href="#dashboard" class="nav-link" data-secao="dashboard"><span>🏠</span>Início</a>
+  <a href="#clientes" class="nav-link" data-secao="clientes"><span>👥</span>Clientes</a>
+  <a href="#servicos" class="nav-link" data-secao="servicos"><span>📅</span>Agenda</a>
+  <a href="#financeiro" class="nav-link" data-secao="financeiro"><span>💰</span>Financeiro</a>
+  <a href="#configuracoes" class="nav-link" data-secao="configuracoes"><span>⚙️</span>Ajustes</a>
+</nav>
+
+<!-- ===================== TOASTS ===================== -->
+<div id="toast-container" class="toast-container"></div>
+
+<!-- ===================== MODAL DE CONFIRMAÇÃO ===================== -->
+<div id="modal-confirmacao" class="modal">
+  <div class="modal__caixa modal__caixa--pequena">
+    <h3 class="modal__titulo">Confirmar ação?</h3>
+    <p class="modal__descricao">Tem certeza?</p>
+    <div class="modal__acoes">
+      <button id="btn-cancelar-acao" class="btn btn--secundario">Cancelar</button>
+      <button id="btn-confirmar-acao" class="btn btn--perigo">Excluir</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL: CLIENTE (formulário) ===================== -->
+<div id="modal-cliente" class="modal">
+  <div class="modal__caixa">
+    <div class="modal__cabecalho">
+      <h3 id="modal-cliente-titulo">Novo cliente</h3>
+      <button class="modal__fechar" data-fechar-modal="modal-cliente">×</button>
+    </div>
+    <form id="form-cliente" onsubmit="Clientes.salvar(event)">
+      <input type="hidden" id="cliente-id">
+      <div class="grid-formulario">
+        <div class="campo campo--largo">
+          <label for="cliente-nome">Nome *</label>
+          <input type="text" id="cliente-nome" required>
+        </div>
+        <div class="campo">
+          <label for="cliente-telefone">Telefone</label>
+          <input type="tel" id="cliente-telefone" placeholder="(00) 00000-0000">
+        </div>
+        <div class="campo">
+          <label for="cliente-valor">Valor do serviço (R$)</label>
+          <input type="number" id="cliente-valor" min="0" step="0.01">
+        </div>
+        <div class="campo campo--largo">
+          <label for="cliente-endereco">Endereço</label>
+          <input type="text" id="cliente-endereco">
+        </div>
+        <div class="campo">
+          <label for="cliente-frequencia">Frequência</label>
+          <select id="cliente-frequencia">
+            <option>Semanal</option>
+            <option>Quinzenal</option>
+            <option>Mensal</option>
+            <option>Avulso</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label for="cliente-status">Status</label>
+          <select id="cliente-status">
+            <option>Ativo</option>
+            <option>Inativo</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label for="cliente-ultima-limpeza">Data da última limpeza</label>
+          <input type="date" id="cliente-ultima-limpeza">
+        </div>
+        <div class="campo">
+          <label for="cliente-proxima-limpeza">Próxima limpeza</label>
+          <input type="date" id="cliente-proxima-limpeza">
+        </div>
+      </div>
+      <div class="campo">
+        <label for="cliente-observacoes">Observações</label>
+        <textarea id="cliente-observacoes" rows="2"></textarea>
+      </div>
+      <div class="modal__acoes">
+        <button type="button" class="btn btn--secundario" data-fechar-modal="modal-cliente">Cancelar</button>
+        <button type="submit" class="btn btn--primario">Salvar cliente</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===================== MODAL: DETALHES DO CLIENTE ===================== -->
+<div id="modal-detalhes-cliente" class="modal">
+  <div class="modal__caixa">
+    <div class="modal__cabecalho">
+      <h3>Detalhes do cliente</h3>
+      <button class="modal__fechar" data-fechar-modal="modal-detalhes-cliente">×</button>
+    </div>
+    <div id="detalhes-cliente-corpo"></div>
+    <div class="modal__acoes">
+      <button type="button" class="btn btn--secundario" data-fechar-modal="modal-detalhes-cliente">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL: SERVIÇO ===================== -->
+<div id="modal-servico" class="modal">
+  <div class="modal__caixa">
+    <div class="modal__cabecalho">
+      <h3 id="modal-servico-titulo">Agendar serviço</h3>
+      <button class="modal__fechar" data-fechar-modal="modal-servico">×</button>
+    </div>
+    <form id="form-servico" onsubmit="Servicos.salvar(event)">
+      <input type="hidden" id="servico-id">
+      <div class="grid-formulario">
+        <div class="campo campo--largo">
+          <label for="servico-cliente">Cliente *</label>
+          <select id="servico-cliente" required onchange="Servicos.aoSelecionarCliente()"></select>
+        </div>
+        <div class="campo">
+          <label for="servico-data">Data *</label>
+          <input type="date" id="servico-data" required>
+        </div>
+        <div class="campo">
+          <label for="servico-horario">Horário</label>
+          <input type="time" id="servico-horario">
+        </div>
+        <div class="campo">
+          <label for="servico-funcionario">Funcionário responsável</label>
+          <select id="servico-funcionario"></select>
+        </div>
+        <div class="campo">
+          <label for="servico-valor">Valor (R$)</label>
+          <input type="number" id="servico-valor" min="0" step="0.01">
+        </div>
+        <div class="campo">
+          <label for="servico-status">Status</label>
+          <select id="servico-status">
+            <option>Agendado</option>
+            <option>Pendente</option>
+            <option>Concluído</option>
+            <option>Cancelado</option>
+          </select>
+        </div>
+      </div>
+      <div class="campo">
+        <label for="servico-observacoes">Observações</label>
+        <textarea id="servico-observacoes" rows="2"></textarea>
+      </div>
+      <div class="modal__acoes">
+        <button type="button" class="btn btn--secundario" data-fechar-modal="modal-servico">Cancelar</button>
+        <button type="submit" class="btn btn--primario">Salvar serviço</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===================== MODAL: FUNCIONÁRIO ===================== -->
+<div id="modal-funcionario" class="modal">
+  <div class="modal__caixa">
+    <div class="modal__cabecalho">
+      <h3 id="modal-funcionario-titulo">Novo funcionário</h3>
+      <button class="modal__fechar" data-fechar-modal="modal-funcionario">×</button>
+    </div>
+    <form id="form-funcionario" onsubmit="Funcionarios.salvar(event)">
+      <input type="hidden" id="funcionario-id">
+      <div class="grid-formulario">
+        <div class="campo campo--largo">
+          <label for="funcionario-nome">Nome *</label>
+          <input type="text" id="funcionario-nome" required>
+        </div>
+        <div class="campo">
+          <label for="funcionario-telefone">Telefone</label>
+          <input type="tel" id="funcionario-telefone" placeholder="(00) 00000-0000">
+        </div>
+        <div class="campo">
+          <label for="funcionario-forma-pagamento">Forma de pagamento</label>
+          <input type="text" id="funcionario-forma-pagamento" placeholder="Ex: Pix, diária, mensal">
+        </div>
+        <div class="campo">
+          <label for="funcionario-valor">Valor recebido (R$)</label>
+          <input type="number" id="funcionario-valor" min="0" step="0.01">
+        </div>
+      </div>
+      <div class="campo">
+        <label for="funcionario-observacoes">Observações</label>
+        <textarea id="funcionario-observacoes" rows="2"></textarea>
+      </div>
+      <div class="modal__acoes">
+        <button type="button" class="btn btn--secundario" data-fechar-modal="modal-funcionario">Cancelar</button>
+        <button type="submit" class="btn btn--primario">Salvar funcionário</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===================== MODAL: MOVIMENTAÇÃO FINANCEIRA ===================== -->
+<div id="modal-financeiro" class="modal">
+  <div class="modal__caixa">
+    <div class="modal__cabecalho">
+      <h3 id="modal-financeiro-titulo">Nova movimentação</h3>
+      <button class="modal__fechar" data-fechar-modal="modal-financeiro">×</button>
+    </div>
+    <form id="form-financeiro" onsubmit="Financeiro.salvar(event)">
+      <input type="hidden" id="mov-id">
+      <div class="grid-formulario">
+        <div class="campo">
+          <label for="mov-tipo">Tipo *</label>
+          <select id="mov-tipo" onchange="Financeiro.preencherSelectCategoria()">
+            <option>Receita</option>
+            <option>Despesa</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label for="mov-categoria">Categoria *</label>
+          <select id="mov-categoria" required></select>
+        </div>
+        <div class="campo">
+          <label for="mov-valor">Valor (R$) *</label>
+          <input type="number" id="mov-valor" min="0.01" step="0.01" required>
+        </div>
+        <div class="campo">
+          <label for="mov-data">Data *</label>
+          <input type="date" id="mov-data" required>
+        </div>
+        <div class="campo campo--largo">
+          <label for="mov-descricao">Descrição</label>
+          <input type="text" id="mov-descricao">
+        </div>
+      </div>
+      <div class="modal__acoes">
+        <button type="button" class="btn btn--secundario" data-fechar-modal="modal-financeiro">Cancelar</button>
+        <button type="submit" class="btn btn--primario">Salvar movimentação</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+/* ==========================================================================
+   STORAGE.JS
+   Camada única de acesso aos dados (localStorage).
+   Nenhum outro arquivo deve chamar localStorage diretamente:
+   sempre passe por estas funções. Isso facilita trocar o "banco de dados"
+   no futuro (ex: para Supabase) sem reescrever o sistema todo.
+   ========================================================================== */
+
+const DB_KEYS = {
+  clientes: 'tfl_clientes',
+  funcionarios: 'tfl_funcionarios',
+  servicos: 'tfl_servicos',
+  financeiro: 'tfl_financeiro',
+  config: 'tfl_config'
+};
+
+/* Configuração padrão (usada apenas na primeira vez que o sistema roda) */
+const CONFIG_PADRAO = {
+  empresa: {
+    nome: 'Toque Final Limpeza',
+    telefone: '',
+    endereco: ''
+  },
+  precos: {
+    valorM2: null,        // R$ por m² (null = não configurado ainda)
+    valorComodo: null,    // R$ por cômodo
+    valorBanheiro: null,  // R$ por banheiro
+    multiplicadores: {    // multiplicador aplicado sobre o valor base, por tipo de limpeza
+      padrao: 1,
+      pesada: 1.4,
+      pos_obra: 1.8
+    }
+  },
+  categoriasDespesas: ['Produtos de limpeza', 'Transporte', 'Pagamento a funcionários', 'Outras despesas'],
+  categoriasReceitas: ['Serviço de limpeza', 'Outras receitas']
+};
+
+function _read(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw === null) return fallback;
+    return JSON.parse(raw);
+  } catch (e) {
+    console.error('Erro ao ler do localStorage:', key, e);
+    return fallback;
+  }
+}
+
+function _write(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+    return true;
+  } catch (e) {
+    console.error('Erro ao salvar no localStorage:', key, e);
+    return false;
+  }
+}
+
+/* Gera um ID único simples baseado em tempo + aleatório */
+function gerarId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+
+/* Garante que todas as chaves existam no localStorage (roda uma vez no início) */
+function inicializarStorage() {
+  if (localStorage.getItem(DB_KEYS.clientes) === null) _write(DB_KEYS.clientes, []);
+  if (localStorage.getItem(DB_KEYS.funcionarios) === null) _write(DB_KEYS.funcionarios, []);
+  if (localStorage.getItem(DB_KEYS.servicos) === null) _write(DB_KEYS.servicos, []);
+  if (localStorage.getItem(DB_KEYS.financeiro) === null) _write(DB_KEYS.financeiro, []);
+  if (localStorage.getItem(DB_KEYS.config) === null) _write(DB_KEYS.config, CONFIG_PADRAO);
+}
+
+/* ---------------- CLIENTES ---------------- */
+const ClientesDB = {
+  listar() { return _read(DB_KEYS.clientes, []); },
+  buscarPorId(id) { return this.listar().find(c => c.id === id) || null; },
+  salvar(cliente) {
+    const lista = this.listar();
+    if (cliente.id) {
+      const idx = lista.findIndex(c => c.id === cliente.id);
+      if (idx >= 0) lista[idx] = cliente;
+    } else {
+      cliente.id = gerarId();
+      cliente.criadoEm = new Date().toISOString();
+      lista.push(cliente);
+    }
+    _write(DB_KEYS.clientes, lista);
+    return cliente;
+  },
+  excluir(id) {
+    const lista = this.listar().filter(c => c.id !== id);
+    _write(DB_KEYS.clientes, lista);
+  }
+};
+
+/* ---------------- FUNCIONÁRIOS ---------------- */
+const FuncionariosDB = {
+  listar() { return _read(DB_KEYS.funcionarios, []); },
+  buscarPorId(id) { return this.listar().find(f => f.id === id) || null; },
+  salvar(funcionario) {
+    const lista = this.listar();
+    if (funcionario.id) {
+      const idx = lista.findIndex(f => f.id === funcionario.id);
+      if (idx >= 0) lista[idx] = funcionario;
+    } else {
+      funcionario.id = gerarId();
+      funcionario.criadoEm = new Date().toISOString();
+      lista.push(funcionario);
+    }
+    _write(DB_KEYS.funcionarios, lista);
+    return funcionario;
+  },
+  excluir(id) {
+    const lista = this.listar().filter(f => f.id !== id);
+    _write(DB_KEYS.funcionarios, lista);
+  }
+};
+
+/* ---------------- SERVIÇOS ---------------- */
+const ServicosDB = {
+  listar() { return _read(DB_KEYS.servicos, []); },
+  buscarPorId(id) { return this.listar().find(s => s.id === id) || null; },
+  salvar(servico) {
+    const lista = this.listar();
+    if (servico.id) {
+      const idx = lista.findIndex(s => s.id === servico.id);
+      if (idx >= 0) lista[idx] = servico;
+    } else {
+      servico.id = gerarId();
+      servico.criadoEm = new Date().toISOString();
+      lista.push(servico);
+    }
+    _write(DB_KEYS.servicos, lista);
+    return servico;
+  },
+  excluir(id) {
+    const lista = this.listar().filter(s => s.id !== id);
+    _write(DB_KEYS.servicos, lista);
+  }
+};
+
+/* ---------------- FINANCEIRO ---------------- */
+const FinanceiroDB = {
+  listar() { return _read(DB_KEYS.financeiro, []); },
+  buscarPorId(id) { return this.listar().find(m => m.id === id) || null; },
+  salvar(mov) {
+    const lista = this.listar();
+    if (mov.id) {
+      const idx = lista.findIndex(m => m.id === mov.id);
+      if (idx >= 0) lista[idx] = mov;
+    } else {
+      mov.id = gerarId();
+      mov.criadoEm = new Date().toISOString();
+      lista.push(mov);
+    }
+    _write(DB_KEYS.financeiro, lista);
+    return mov;
+  },
+  excluir(id) {
+    const lista = this.listar().filter(m => m.id !== id);
+    _write(DB_KEYS.financeiro, lista);
+  }
+};
+
+/* ---------------- CONFIGURAÇÕES ---------------- */
+const ConfigDB = {
+  obter() { return _read(DB_KEYS.config, CONFIG_PADRAO); },
+  salvar(config) { _write(DB_KEYS.config, config); return config; }
+};
+
+
+/* ==========================================================================
+   APP.JS
+   Núcleo do sistema: inicialização, navegação entre seções,
+   funções utilitárias compartilhadas (moeda, datas, toasts, confirmação).
+   ========================================================================== */
+
+/* ---------------- Utilitários de formatação ---------------- */
+
+function formatarMoeda(valor) {
+  const n = Number(valor) || 0;
+  return n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+/* Converte string "1234,56" ou "1234.56" digitada pelo usuário em número */
+function parseValorMonetario(str) {
+  if (typeof str === 'number') return str;
+  if (!str) return 0;
+  const limpo = String(str).trim().replace(/\./g, '').replace(',', '.').replace(/[^\d.-]/g, '');
+  const n = parseFloat(limpo);
+  return isNaN(n) ? 0 : n;
+}
+
+/* Recebe "2026-08-19" (input date) e devolve "19/08/2026" */
+function formatarData(isoDate) {
+  if (!isoDate) return '—';
+  const [ano, mes, dia] = isoDate.split('-');
+  if (!ano || !mes || !dia) return isoDate;
+  return `${dia}/${mes}/${ano}`;
+}
+
+function hojeISO() {
+  const d = new Date();
+  const mes = String(d.getMonth() + 1).padStart(2, '0');
+  const dia = String(d.getDate()).padStart(2, '0');
+  return `${d.getFullYear()}-${mes}-${dia}`;
+}
+
+/* "2026-08" do mês atual, útil para filtros */
+function mesAtualISO() {
+  return hojeISO().slice(0, 7);
+}
+
+function escapeHTML(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/* ---------------- Toasts (mensagens de confirmação) ---------------- */
+
+function mostrarToast(mensagem, tipo = 'sucesso') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast toast--${tipo}`;
+  const icone = tipo === 'sucesso' ? '✓' : tipo === 'erro' ? '✕' : 'ℹ';
+  toast.innerHTML = `<span class="toast__icone">${icone}</span><span>${escapeHTML(mensagem)}</span>`;
+  container.appendChild(toast);
+  requestAnimationFrame(() => toast.classList.add('toast--visivel'));
+  setTimeout(() => {
+    toast.classList.remove('toast--visivel');
+    setTimeout(() => toast.remove(), 300);
+  }, 3200);
+}
+
+/* ---------------- Modal de confirmação (para ações destrutivas) ---------------- */
+
+function confirmarAcao(titulo, descricao) {
+  return new Promise((resolve) => {
+    const overlay = document.getElementById('modal-confirmacao');
+    overlay.querySelector('.modal__titulo').textContent = titulo;
+    overlay.querySelector('.modal__descricao').textContent = descricao;
+    overlay.classList.add('modal--aberto');
+
+    const btnConfirmar = document.getElementById('btn-confirmar-acao');
+    const btnCancelar = document.getElementById('btn-cancelar-acao');
+
+    function limpar(resultado) {
+      overlay.classList.remove('modal--aberto');
+      btnConfirmar.removeEventListener('click', onConfirmar);
+      btnCancelar.removeEventListener('click', onCancelar);
+      resolve(resultado);
+    }
+    function onConfirmar() { limpar(true); }
+    function onCancelar() { limpar(false); }
+
+    btnConfirmar.addEventListener('click', onConfirmar);
+    btnCancelar.addEventListener('click', onCancelar);
+  });
+}
+
+/* ---------------- Modal genérico (formulários) ---------------- */
+
+function abrirModal(idModal) {
+  document.getElementById(idModal).classList.add('modal--aberto');
+}
+function fecharModal(idModal) {
+  document.getElementById(idModal).classList.remove('modal--aberto');
+}
+
+/* ---------------- Navegação entre seções ---------------- */
+
+const SECOES = ['dashboard', 'clientes', 'servicos', 'funcionarios', 'financeiro', 'orcamento', 'relatorios', 'configuracoes'];
+
+const RENDERIZADORES = {
+  dashboard: () => Dashboard.render(),
+  clientes: () => Clientes.render(),
+  servicos: () => Servicos.render(),
+  funcionarios: () => Funcionarios.render(),
+  financeiro: () => Financeiro.render(),
+  orcamento: () => Orcamento.render(),
+  relatorios: () => Relatorios.render(),
+  configuracoes: () => Configuracoes.render()
+};
+
+function navegarPara(secao) {
+  if (!SECOES.includes(secao)) secao = 'dashboard';
+
+  SECOES.forEach(s => {
+    const el = document.getElementById(`secao-${s}`);
+    if (el) el.classList.toggle('secao--ativa', s === secao);
+  });
+
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.classList.toggle('nav-link--ativo', link.dataset.secao === secao);
+  });
+
+  const menuLateral = document.getElementById('menu-lateral');
+  menuLateral.classList.remove('menu-lateral--aberto');
+  document.getElementById('overlay-menu').classList.remove('overlay-menu--visivel');
+
+  window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
+
+  if (RENDERIZADORES[secao]) RENDERIZADORES[secao]();
+
+  location.hash = secao;
+}
+
+function aplicarNomeEmpresa() {
+  const config = ConfigDB.obter();
+  const nome = config.empresa.nome || 'Toque Final Limpeza';
+  document.querySelectorAll('.js-nome-empresa').forEach(el => el.textContent = nome);
+  document.title = `${nome} — Painel Administrativo`;
+}
+
+/* ---------------- Inicialização ---------------- */
+
+document.addEventListener('DOMContentLoaded', () => {
+  inicializarStorage();
+  aplicarNomeEmpresa();
+
+  // Links de navegação (sidebar + menu mobile)
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      navegarPara(link.dataset.secao);
+    });
+  });
+
+  // Botão hambúrguer (mobile)
+  document.getElementById('btn-abrir-menu').addEventListener('click', () => {
+    document.getElementById('menu-lateral').classList.add('menu-lateral--aberto');
+    document.getElementById('overlay-menu').classList.add('overlay-menu--visivel');
+  });
+  document.getElementById('overlay-menu').addEventListener('click', () => {
+    document.getElementById('menu-lateral').classList.remove('menu-lateral--aberto');
+    document.getElementById('overlay-menu').classList.remove('overlay-menu--visivel');
+  });
+
+  // Fecha modais clicando fora do conteúdo, ou no "X"
+  document.querySelectorAll('.modal').forEach(overlay => {
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) overlay.classList.remove('modal--aberto');
+    });
+  });
+  document.querySelectorAll('[data-fechar-modal]').forEach(btn => {
+    btn.addEventListener('click', () => fecharModal(btn.dataset.fecharModal));
+  });
+
+  // Seção inicial (via hash da URL, ou dashboard por padrão)
+  const secaoInicial = location.hash ? location.hash.replace('#', '') : 'dashboard';
+  navegarPara(secaoInicial);
+});
+
+
+/* ==========================================================================
+   DASHBOARD.JS — Visão geral do negócio
+   ========================================================================== */
+
+const Dashboard = {
+  render() {
+    const hoje = hojeISO();
+    const mesAtual = mesAtualISO();
+
+    const clientes = ClientesDB.listar();
+    const servicos = ServicosDB.listar();
+    const movimentacoes = FinanceiroDB.listar();
+
+    const movMesAtual = movimentacoes.filter(m => m.data && m.data.startsWith(mesAtual));
+    const faturamento = movMesAtual.filter(m => m.tipo === 'Receita').reduce((s, m) => s + m.valor, 0);
+    const despesas = movMesAtual.filter(m => m.tipo === 'Despesa').reduce((s, m) => s + m.valor, 0);
+    const lucro = faturamento - despesas;
+
+    const servicosMes = servicos.filter(s => s.data && s.data.startsWith(mesAtual));
+    const concluidos = servicosMes.filter(s => s.status === 'Concluído').length;
+    const pendentes = servicos.filter(s => s.status === 'Pendente' || s.status === 'Agendado').length;
+    const clientesAtivos = clientes.filter(c => c.status === 'Ativo').length;
+
+    document.getElementById('dash-faturamento').textContent = formatarMoeda(faturamento);
+    document.getElementById('dash-despesas').textContent = formatarMoeda(despesas);
+    const elLucro = document.getElementById('dash-lucro');
+    elLucro.textContent = formatarMoeda(lucro);
+    elLucro.classList.toggle('valor--negativo', lucro < 0);
+    document.getElementById('dash-clientes').textContent = clientesAtivos;
+    document.getElementById('dash-concluidos').textContent = concluidos;
+    document.getElementById('dash-pendentes').textContent = pendentes;
+
+    this.renderProximosServicos(servicos, clientes, hoje);
+    this.renderGrafico(movimentacoes);
+  },
+
+  renderProximosServicos(servicos, clientes, hoje) {
+    const container = document.getElementById('dash-proximos-servicos');
+    const proximos = servicos
+      .filter(s => s.data >= hoje && s.status !== 'Cancelado' && s.status !== 'Concluído')
+      .sort((a, b) => (a.data + (a.horario || '')).localeCompare(b.data + (b.horario || '')))
+      .slice(0, 5);
+
+    if (proximos.length === 0) {
+      container.innerHTML = `<div class="estado-vazio estado-vazio--compacto">
+        <p>Nenhum serviço agendado para os próximos dias.</p>
+      </div>`;
+      return;
+    }
+
+    container.innerHTML = proximos.map(s => {
+      const cliente = clientes.find(c => c.id === s.clienteId);
+      return `<div class="item-proximo-servico">
+        <div class="item-proximo-servico__data">
+          <span>${formatarData(s.data).slice(0, 5)}</span>
+          <span class="item-proximo-servico__hora">${escapeHTML(s.horario) || ''}</span>
+        </div>
+        <div class="item-proximo-servico__info">
+          <strong>${escapeHTML(cliente ? cliente.nome : 'Cliente removido')}</strong>
+          <span class="badge badge--${Servicos.corStatus(s.status)}">${s.status}</span>
+        </div>
+        <div class="item-proximo-servico__valor">${formatarMoeda(s.valor)}</div>
+      </div>`;
+    }).join('');
+  },
+
+  renderGrafico(movimentacoes) {
+    const canvas = document.getElementById('grafico-faturamento');
+    const ctx = canvas.getContext('2d');
+
+    // Ajusta resolução ao tamanho real exibido (responsivo, sem ficar borrado)
+    const dpr = window.devicePixelRatio || 1;
+    const largura = canvas.parentElement.clientWidth;
+    const altura = 220;
+    canvas.width = largura * dpr;
+    canvas.height = altura * dpr;
+    canvas.style.width = largura + 'px';
+    canvas.style.height = altura + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, largura, altura);
+
+    // Últimos 6 meses (incluindo o atual)
+    const meses = [];
+    const dataRef = new Date();
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(dataRef.getFullYear(), dataRef.getMonth() - i, 1);
+      meses.push({
+        chave: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`,
+        rotulo: d.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '')
+      });
+    }
+
+    const valores = meses.map(m =>
+      movimentacoes
+        .filter(mov => mov.tipo === 'Receita' && mov.data && mov.data.startsWith(m.chave))
+        .reduce((s, mov) => s + mov.valor, 0)
+    );
+
+    const temDados = valores.some(v => v > 0);
+    if (!temDados) {
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '14px "Plus Jakarta Sans", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Ainda não há receitas registradas para exibir no gráfico.', largura / 2, altura / 2);
+      return;
+    }
+
+    const maxValor = Math.max(...valores, 1);
+    const paddingBase = 30;
+    const larguraUtil = largura - 20;
+    const larguraBarra = (larguraUtil / meses.length) * 0.5;
+    const espacamento = larguraUtil / meses.length;
+
+    meses.forEach((m, i) => {
+      const x = 10 + i * espacamento + (espacamento - larguraBarra) / 2;
+      const alturaBarra = (valores[i] / maxValor) * (altura - paddingBase - 30);
+      const y = altura - paddingBase - alturaBarra;
+
+      const gradiente = ctx.createLinearGradient(0, y, 0, altura - paddingBase);
+      gradiente.addColorStop(0, '#0d9488');
+      gradiente.addColorStop(1, '#14b8a6');
+      ctx.fillStyle = gradiente;
+
+      const raio = 6;
+      ctx.beginPath();
+      ctx.moveTo(x, y + raio);
+      ctx.arcTo(x, y, x + raio, y, raio);
+      ctx.arcTo(x + larguraBarra, y, x + larguraBarra, y + raio, raio);
+      ctx.lineTo(x + larguraBarra, altura - paddingBase);
+      ctx.lineTo(x, altura - paddingBase);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = '#475569';
+      ctx.font = '12px "Plus Jakarta Sans", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(m.rotulo, x + larguraBarra / 2, altura - 10);
+
+      if (valores[i] > 0) {
+        ctx.fillStyle = '#0f172a';
+        ctx.font = '600 11px "Plus Jakarta Sans", sans-serif';
+        const rotuloValor = valores[i] >= 1000
+          ? `${(valores[i] / 1000).toFixed(1).replace('.0', '')}k`
+          : Math.round(valores[i]).toString();
+        ctx.fillText(rotuloValor, x + larguraBarra / 2, y - 8);
+      }
+    });
+  }
+};
+
+window.addEventListener('resize', () => {
+  const secaoAtiva = document.getElementById('secao-dashboard');
+  if (secaoAtiva && secaoAtiva.classList.contains('secao--ativa')) {
+    Dashboard.renderGrafico(FinanceiroDB.listar());
+  }
+});
+
+
+/* ==========================================================================
+   CLIENTES.JS — CRUD completo de clientes
+   ========================================================================== */
+
+const Clientes = {
+  termoBusca: '',
+
+  render() {
+    const container = document.getElementById('lista-clientes');
+    const clientes = this.obterFiltrados();
+
+    if (ClientesDB.listar().length === 0) {
+      container.innerHTML = this.estadoVazio();
+      this.atualizarContador(0, 0);
+      return;
+    }
+
+    if (clientes.length === 0) {
+      container.innerHTML = `<div class="estado-vazio">
+        <div class="estado-vazio__icone">🔍</div>
+        <p>Nenhum cliente encontrado para "${escapeHTML(this.termoBusca)}".</p>
+      </div>`;
+      this.atualizarContador(clientes.length, ClientesDB.listar().length);
+      return;
+    }
+
+    container.innerHTML = `<div class="tabela-wrap"><table class="tabela">
+      <thead><tr>
+        <th>Nome</th><th>Telefone</th><th>Valor</th><th>Frequência</th>
+        <th>Próxima limpeza</th><th>Status</th><th></th>
+      </tr></thead>
+      <tbody>
+        ${clientes.map(c => `
+          <tr>
+            <td data-rotulo="Nome"><strong>${escapeHTML(c.nome)}</strong></td>
+            <td data-rotulo="Telefone">${escapeHTML(c.telefone) || '—'}</td>
+            <td data-rotulo="Valor">${formatarMoeda(c.valorServico)}</td>
+            <td data-rotulo="Frequência">${escapeHTML(c.frequencia) || '—'}</td>
+            <td data-rotulo="Próxima limpeza">${formatarData(c.proximaLimpeza)}</td>
+            <td data-rotulo="Status"><span class="badge badge--${c.status === 'Ativo' ? 'verde' : 'cinza'}">${c.status}</span></td>
+            <td class="tabela__acoes">
+              <button class="btn-icone" title="Ver detalhes" data-ver="${c.id}">👁</button>
+              <button class="btn-icone" title="Editar" data-editar="${c.id}">✎</button>
+              <button class="btn-icone btn-icone--perigo" title="Excluir" data-excluir="${c.id}">🗑</button>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table></div>`;
+
+    this.atualizarContador(clientes.length, ClientesDB.listar().length);
+
+    container.querySelectorAll('[data-ver]').forEach(b => b.addEventListener('click', () => this.verDetalhes(b.dataset.ver)));
+    container.querySelectorAll('[data-editar]').forEach(b => b.addEventListener('click', () => this.abrirFormulario(b.dataset.editar)));
+    container.querySelectorAll('[data-excluir]').forEach(b => b.addEventListener('click', () => this.excluir(b.dataset.excluir)));
+  },
+
+  estadoVazio() {
+    return `<div class="estado-vazio">
+      <div class="estado-vazio__icone">🧺</div>
+      <h3>Nenhum cliente cadastrado ainda</h3>
+      <p>Adicione o primeiro cliente para começar a organizar os serviços.</p>
+      <button class="btn btn--primario" onclick="Clientes.abrirFormulario()">+ Adicionar cliente</button>
+    </div>`;
+  },
+
+  atualizarContador(exibindo, total) {
+    const el = document.getElementById('contador-clientes');
+    if (el) el.textContent = `${total} cliente${total === 1 ? '' : 's'} cadastrado${total === 1 ? '' : 's'}`;
+  },
+
+  obterFiltrados() {
+    const termo = this.termoBusca.trim().toLowerCase();
+    let lista = ClientesDB.listar().sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+    if (termo) {
+      lista = lista.filter(c =>
+        c.nome.toLowerCase().includes(termo) ||
+        (c.telefone || '').toLowerCase().includes(termo)
+      );
+    }
+    return lista;
+  },
+
+  buscar(termo) {
+    this.termoBusca = termo;
+    this.render();
+  },
+
+  abrirFormulario(id = null) {
+    const cliente = id ? ClientesDB.buscarPorId(id) : null;
+    const form = document.getElementById('form-cliente');
+    form.reset();
+    document.getElementById('cliente-id').value = cliente ? cliente.id : '';
+    document.getElementById('modal-cliente-titulo').textContent = cliente ? 'Editar cliente' : 'Novo cliente';
+
+    if (cliente) {
+      document.getElementById('cliente-nome').value = cliente.nome || '';
+      document.getElementById('cliente-telefone').value = cliente.telefone || '';
+      document.getElementById('cliente-endereco').value = cliente.endereco || '';
+      document.getElementById('cliente-valor').value = cliente.valorServico || '';
+      document.getElementById('cliente-frequencia').value = cliente.frequencia || 'Semanal';
+      document.getElementById('cliente-ultima-limpeza').value = cliente.ultimaLimpeza || '';
+      document.getElementById('cliente-proxima-limpeza').value = cliente.proximaLimpeza || '';
+      document.getElementById('cliente-status').value = cliente.status || 'Ativo';
+      document.getElementById('cliente-observacoes').value = cliente.observacoes || '';
+    } else {
+      document.getElementById('cliente-status').value = 'Ativo';
+      document.getElementById('cliente-frequencia').value = 'Semanal';
+    }
+
+    abrirModal('modal-cliente');
+    document.getElementById('cliente-nome').focus();
+  },
+
+  salvar(event) {
+    event.preventDefault();
+
+    const nome = document.getElementById('cliente-nome').value.trim();
+    if (!nome) { mostrarToast('Informe o nome do cliente.', 'erro'); return; }
+
+    const valorServico = parseValorMonetario(document.getElementById('cliente-valor').value);
+    if (valorServico < 0) { mostrarToast('O valor do serviço não pode ser negativo.', 'erro'); return; }
+
+    const cliente = {
+      id: document.getElementById('cliente-id').value || null,
+      nome,
+      telefone: document.getElementById('cliente-telefone').value.trim(),
+      endereco: document.getElementById('cliente-endereco').value.trim(),
+      valorServico,
+      frequencia: document.getElementById('cliente-frequencia').value,
+      ultimaLimpeza: document.getElementById('cliente-ultima-limpeza').value,
+      proximaLimpeza: document.getElementById('cliente-proxima-limpeza').value,
+      status: document.getElementById('cliente-status').value,
+      observacoes: document.getElementById('cliente-observacoes').value.trim()
+    };
+
+    ClientesDB.salvar(cliente);
+    fecharModal('modal-cliente');
+    mostrarToast('Cliente salvo com sucesso.');
+    this.render();
+  },
+
+  async excluir(id) {
+    const cliente = ClientesDB.buscarPorId(id);
+    if (!cliente) return;
+    const confirmado = await confirmarAcao(
+      'Excluir cliente?',
+      `Tem certeza que deseja excluir "${cliente.nome}"? Essa ação não pode ser desfeita.`
+    );
+    if (!confirmado) return;
+    ClientesDB.excluir(id);
+    mostrarToast('Cliente excluído.');
+    this.render();
+  },
+
+  verDetalhes(id) {
+    const c = ClientesDB.buscarPorId(id);
+    if (!c) return;
+    const corpo = document.getElementById('detalhes-cliente-corpo');
+    corpo.innerHTML = `
+      <dl class="lista-detalhes">
+        <dt>Nome</dt><dd>${escapeHTML(c.nome)}</dd>
+        <dt>Telefone</dt><dd>${escapeHTML(c.telefone) || '—'}</dd>
+        <dt>Endereço</dt><dd>${escapeHTML(c.endereco) || '—'}</dd>
+        <dt>Valor do serviço</dt><dd>${formatarMoeda(c.valorServico)}</dd>
+        <dt>Frequência</dt><dd>${escapeHTML(c.frequencia) || '—'}</dd>
+        <dt>Última limpeza</dt><dd>${formatarData(c.ultimaLimpeza)}</dd>
+        <dt>Próxima limpeza</dt><dd>${formatarData(c.proximaLimpeza)}</dd>
+        <dt>Status</dt><dd><span class="badge badge--${c.status === 'Ativo' ? 'verde' : 'cinza'}">${c.status}</span></dd>
+        <dt>Observações</dt><dd>${escapeHTML(c.observacoes) || '—'}</dd>
+      </dl>`;
+    abrirModal('modal-detalhes-cliente');
+  }
+};
+
+
+/* ==========================================================================
+   SERVICOS.JS — CRUD de serviços + visualização de agenda
+   ========================================================================== */
+
+const Servicos = {
+  filtroStatus: 'todos',
+
+  render() {
+    this.preencherSelectClientes();
+    this.preencherSelectFuncionarios();
+
+    const todos = ServicosDB.listar();
+    const container = document.getElementById('lista-servicos');
+
+    if (todos.length === 0) {
+      container.innerHTML = `<div class="estado-vazio">
+        <div class="estado-vazio__icone">📅</div>
+        <h3>Nenhum serviço agendado ainda</h3>
+        <p>Cadastre clientes e agende o primeiro serviço para começar a preencher a agenda.</p>
+        <button class="btn btn--primario" onclick="Servicos.abrirFormulario()">+ Agendar serviço</button>
+      </div>`;
+      return;
+    }
+
+    let lista = todos.slice().sort((a, b) => (a.data + a.horario).localeCompare(b.data + b.horario));
+    if (this.filtroStatus !== 'todos') {
+      lista = lista.filter(s => s.status === this.filtroStatus);
+    }
+
+    if (lista.length === 0) {
+      container.innerHTML = `<div class="estado-vazio">
+        <div class="estado-vazio__icone">🔍</div>
+        <p>Nenhum serviço com status "${escapeHTML(this.filtroStatus)}".</p>
+      </div>`;
+      return;
+    }
+
+    container.innerHTML = `<div class="tabela-wrap"><table class="tabela">
+      <thead><tr>
+        <th>Data</th><th>Horário</th><th>Cliente</th><th>Funcionário</th>
+        <th>Valor</th><th>Status</th><th></th>
+      </tr></thead>
+      <tbody>
+        ${lista.map(s => {
+          const cliente = ClientesDB.buscarPorId(s.clienteId);
+          const funcionario = FuncionariosDB.buscarPorId(s.funcionarioId);
+          return `<tr>
+            <td data-rotulo="Data">${formatarData(s.data)}</td>
+            <td data-rotulo="Horário">${escapeHTML(s.horario) || '—'}</td>
+            <td data-rotulo="Cliente">${escapeHTML(cliente ? cliente.nome : '(cliente removido)')}</td>
+            <td data-rotulo="Funcionário">${escapeHTML(funcionario ? funcionario.nome : '—')}</td>
+            <td data-rotulo="Valor">${formatarMoeda(s.valor)}</td>
+            <td data-rotulo="Status"><span class="badge badge--${this.corStatus(s.status)}">${s.status}</span></td>
+            <td class="tabela__acoes">
+              <button class="btn-icone" title="Editar" data-editar="${s.id}">✎</button>
+              <button class="btn-icone btn-icone--perigo" title="Excluir" data-excluir="${s.id}">🗑</button>
+            </td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table></div>`;
+
+    container.querySelectorAll('[data-editar]').forEach(b => b.addEventListener('click', () => this.abrirFormulario(b.dataset.editar)));
+    container.querySelectorAll('[data-excluir]').forEach(b => b.addEventListener('click', () => this.excluir(b.dataset.excluir)));
+  },
+
+  corStatus(status) {
+    return { 'Agendado': 'azul', 'Concluído': 'verde', 'Cancelado': 'vermelho', 'Pendente': 'amarelo' }[status] || 'cinza';
+  },
+
+  filtrar(status) {
+    this.filtroStatus = status;
+    document.querySelectorAll('.filtro-status-servico').forEach(b => {
+      b.classList.toggle('chip--ativo', b.dataset.status === status);
+    });
+    this.render();
+  },
+
+  preencherSelectClientes() {
+    const select = document.getElementById('servico-cliente');
+    const clientes = ClientesDB.listar().sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+    select.innerHTML = '<option value="">Selecione um cliente</option>' +
+      clientes.map(c => `<option value="${c.id}">${escapeHTML(c.nome)}</option>`).join('');
+  },
+
+  preencherSelectFuncionarios() {
+    const select = document.getElementById('servico-funcionario');
+    const funcionarios = FuncionariosDB.listar().sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+    select.innerHTML = '<option value="">Nenhum / a definir</option>' +
+      funcionarios.map(f => `<option value="${f.id}">${escapeHTML(f.nome)}</option>`).join('');
+  },
+
+  abrirFormulario(id = null) {
+    if (ClientesDB.listar().length === 0) {
+      mostrarToast('Cadastre um cliente antes de agendar um serviço.', 'erro');
+      return;
+    }
+    this.preencherSelectClientes();
+    this.preencherSelectFuncionarios();
+
+    const servico = id ? ServicosDB.buscarPorId(id) : null;
+    const form = document.getElementById('form-servico');
+    form.reset();
+    document.getElementById('servico-id').value = servico ? servico.id : '';
+    document.getElementById('modal-servico-titulo').textContent = servico ? 'Editar serviço' : 'Agendar serviço';
+
+    if (servico) {
+      document.getElementById('servico-cliente').value = servico.clienteId || '';
+      document.getElementById('servico-data').value = servico.data || '';
+      document.getElementById('servico-horario').value = servico.horario || '';
+      document.getElementById('servico-funcionario').value = servico.funcionarioId || '';
+      document.getElementById('servico-valor').value = servico.valor || '';
+      document.getElementById('servico-status').value = servico.status || 'Agendado';
+      document.getElementById('servico-observacoes').value = servico.observacoes || '';
+    } else {
+      document.getElementById('servico-data').value = hojeISO();
+      document.getElementById('servico-status').value = 'Agendado';
+    }
+
+    abrirModal('modal-servico');
+  },
+
+  aoSelecionarCliente() {
+    // Preenche o valor automaticamente com o valor cadastrado do cliente, ao criar um novo serviço
+    const idCampo = document.getElementById('servico-id').value;
+    if (idCampo) return; // não sobrescreve em edições
+    const clienteId = document.getElementById('servico-cliente').value;
+    const cliente = ClientesDB.buscarPorId(clienteId);
+    if (cliente && !document.getElementById('servico-valor').value) {
+      document.getElementById('servico-valor').value = cliente.valorServico || '';
+    }
+  },
+
+  salvar(event) {
+    event.preventDefault();
+
+    const clienteId = document.getElementById('servico-cliente').value;
+    if (!clienteId) { mostrarToast('Selecione um cliente.', 'erro'); return; }
+
+    const data = document.getElementById('servico-data').value;
+    if (!data) { mostrarToast('Informe a data do serviço.', 'erro'); return; }
+
+    const valor = parseValorMonetario(document.getElementById('servico-valor').value);
+    if (valor < 0) { mostrarToast('O valor não pode ser negativo.', 'erro'); return; }
+
+    const servico = {
+      id: document.getElementById('servico-id').value || null,
+      clienteId,
+      data,
+      horario: document.getElementById('servico-horario').value,
+      funcionarioId: document.getElementById('servico-funcionario').value || null,
+      valor,
+      status: document.getElementById('servico-status').value,
+      observacoes: document.getElementById('servico-observacoes').value.trim()
+    };
+
+    ServicosDB.salvar(servico);
+    fecharModal('modal-servico');
+    mostrarToast('Serviço salvo com sucesso.');
+    this.render();
+  },
+
+  async excluir(id) {
+    const confirmado = await confirmarAcao(
+      'Excluir serviço?',
+      'Tem certeza que deseja excluir este serviço da agenda? Essa ação não pode ser desfeita.'
+    );
+    if (!confirmado) return;
+    ServicosDB.excluir(id);
+    mostrarToast('Serviço excluído.');
+    this.render();
+  }
+};
+
+
+/* ==========================================================================
+   FUNCIONARIOS.JS — Cadastro de funcionários
+   ========================================================================== */
+
+const Funcionarios = {
+  render() {
+    const lista = FuncionariosDB.listar().sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+    const container = document.getElementById('lista-funcionarios');
+
+    if (lista.length === 0) {
+      container.innerHTML = `<div class="estado-vazio">
+        <div class="estado-vazio__icone">🧑‍🤝‍🧑</div>
+        <h3>Nenhum funcionário cadastrado ainda</h3>
+        <p>Adicione a equipe para poder atribuir funcionários aos serviços.</p>
+        <button class="btn btn--primario" onclick="Funcionarios.abrirFormulario()">+ Adicionar funcionário</button>
+      </div>`;
+      return;
+    }
+
+    container.innerHTML = `<div class="tabela-wrap"><table class="tabela">
+      <thead><tr><th>Nome</th><th>Telefone</th><th>Forma de pagamento</th><th>Valor recebido</th><th></th></tr></thead>
+      <tbody>
+        ${lista.map(f => `
+          <tr>
+            <td data-rotulo="Nome"><strong>${escapeHTML(f.nome)}</strong></td>
+            <td data-rotulo="Telefone">${escapeHTML(f.telefone) || '—'}</td>
+            <td data-rotulo="Forma de pagamento">${escapeHTML(f.formaPagamento) || '—'}</td>
+            <td data-rotulo="Valor recebido">${formatarMoeda(f.valorRecebido)}</td>
+            <td class="tabela__acoes">
+              <button class="btn-icone" title="Editar" data-editar="${f.id}">✎</button>
+              <button class="btn-icone btn-icone--perigo" title="Excluir" data-excluir="${f.id}">🗑</button>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table></div>`;
+
+    container.querySelectorAll('[data-editar]').forEach(b => b.addEventListener('click', () => this.abrirFormulario(b.dataset.editar)));
+    container.querySelectorAll('[data-excluir]').forEach(b => b.addEventListener('click', () => this.excluir(b.dataset.excluir)));
+  },
+
+  abrirFormulario(id = null) {
+    const funcionario = id ? FuncionariosDB.buscarPorId(id) : null;
+    const form = document.getElementById('form-funcionario');
+    form.reset();
+    document.getElementById('funcionario-id').value = funcionario ? funcionario.id : '';
+    document.getElementById('modal-funcionario-titulo').textContent = funcionario ? 'Editar funcionário' : 'Novo funcionário';
+
+    if (funcionario) {
+      document.getElementById('funcionario-nome').value = funcionario.nome || '';
+      document.getElementById('funcionario-telefone').value = funcionario.telefone || '';
+      document.getElementById('funcionario-forma-pagamento').value = funcionario.formaPagamento || '';
+      document.getElementById('funcionario-valor').value = funcionario.valorRecebido || '';
+      document.getElementById('funcionario-observacoes').value = funcionario.observacoes || '';
+    }
+
+    abrirModal('modal-funcionario');
+    document.getElementById('funcionario-nome').focus();
+  },
+
+  salvar(event) {
+    event.preventDefault();
+
+    const nome = document.getElementById('funcionario-nome').value.trim();
+    if (!nome) { mostrarToast('Informe o nome do funcionário.', 'erro'); return; }
+
+    const valorRecebido = parseValorMonetario(document.getElementById('funcionario-valor').value);
+    if (valorRecebido < 0) { mostrarToast('O valor recebido não pode ser negativo.', 'erro'); return; }
+
+    const funcionario = {
+      id: document.getElementById('funcionario-id').value || null,
+      nome,
+      telefone: document.getElementById('funcionario-telefone').value.trim(),
+      formaPagamento: document.getElementById('funcionario-forma-pagamento').value.trim(),
+      valorRecebido,
+      observacoes: document.getElementById('funcionario-observacoes').value.trim()
+    };
+
+    FuncionariosDB.salvar(funcionario);
+    fecharModal('modal-funcionario');
+    mostrarToast('Funcionário salvo com sucesso.');
+    this.render();
+  },
+
+  async excluir(id) {
+    const funcionario = FuncionariosDB.buscarPorId(id);
+    if (!funcionario) return;
+    const confirmado = await confirmarAcao(
+      'Excluir funcionário?',
+      `Tem certeza que deseja excluir "${funcionario.nome}"? Essa ação não pode ser desfeita.`
+    );
+    if (!confirmado) return;
+    FuncionariosDB.excluir(id);
+    mostrarToast('Funcionário excluído.');
+    this.render();
+  }
+};
+
+
+/* ==========================================================================
+   FINANCEIRO.JS — Receitas, despesas e cálculo de lucro
+   ========================================================================== */
+
+const Financeiro = {
+  filtroTipo: 'todos',
+  mesFiltro: '',
+
+  render() {
+    this.mesFiltro = this.mesFiltro || mesAtualISO();
+    document.getElementById('financeiro-filtro-mes').value = this.mesFiltro;
+    this.preencherSelectCategoria();
+
+    const todas = FinanceiroDB.listar().filter(m => m.data && m.data.startsWith(this.mesFiltro));
+
+    const receitas = todas.filter(m => m.tipo === 'Receita').reduce((s, m) => s + m.valor, 0);
+    const despesas = todas.filter(m => m.tipo === 'Despesa').reduce((s, m) => s + m.valor, 0);
+    const lucro = receitas - despesas;
+
+    document.getElementById('financeiro-total-receitas').textContent = formatarMoeda(receitas);
+    document.getElementById('financeiro-total-despesas').textContent = formatarMoeda(despesas);
+    const elLucro = document.getElementById('financeiro-lucro');
+    elLucro.textContent = formatarMoeda(lucro);
+    elLucro.classList.toggle('valor--negativo', lucro < 0);
+
+    let lista = todas.slice().sort((a, b) => b.data.localeCompare(a.data));
+    if (this.filtroTipo !== 'todos') lista = lista.filter(m => m.tipo === this.filtroTipo);
+
+    const container = document.getElementById('lista-financeiro');
+
+    if (FinanceiroDB.listar().length === 0) {
+      container.innerHTML = `<div class="estado-vazio">
+        <div class="estado-vazio__icone">💰</div>
+        <h3>Nenhuma movimentação registrada</h3>
+        <p>Registre receitas e despesas para acompanhar o financeiro do mês.</p>
+        <button class="btn btn--primario" onclick="Financeiro.abrirFormulario()">+ Nova movimentação</button>
+      </div>`;
+      return;
+    }
+
+    if (lista.length === 0) {
+      container.innerHTML = `<div class="estado-vazio">
+        <div class="estado-vazio__icone">🔍</div>
+        <p>Nenhuma movimentação encontrada para este filtro.</p>
+      </div>`;
+      return;
+    }
+
+    container.innerHTML = `<div class="tabela-wrap"><table class="tabela">
+      <thead><tr><th>Data</th><th>Tipo</th><th>Categoria</th><th>Descrição</th><th>Valor</th><th></th></tr></thead>
+      <tbody>
+        ${lista.map(m => `
+          <tr>
+            <td data-rotulo="Data">${formatarData(m.data)}</td>
+            <td data-rotulo="Tipo"><span class="badge badge--${m.tipo === 'Receita' ? 'verde' : 'vermelho'}">${m.tipo}</span></td>
+            <td data-rotulo="Categoria">${escapeHTML(m.categoria)}</td>
+            <td data-rotulo="Descrição">${escapeHTML(m.descricao) || '—'}</td>
+            <td data-rotulo="Valor" class="${m.tipo === 'Despesa' ? 'valor--negativo' : ''}">${m.tipo === 'Despesa' ? '- ' : ''}${formatarMoeda(m.valor)}</td>
+            <td class="tabela__acoes">
+              <button class="btn-icone" title="Editar" data-editar="${m.id}">✎</button>
+              <button class="btn-icone btn-icone--perigo" title="Excluir" data-excluir="${m.id}">🗑</button>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table></div>`;
+
+    container.querySelectorAll('[data-editar]').forEach(b => b.addEventListener('click', () => this.abrirFormulario(b.dataset.editar)));
+    container.querySelectorAll('[data-excluir]').forEach(b => b.addEventListener('click', () => this.excluir(b.dataset.excluir)));
+  },
+
+  filtrarMes(mes) {
+    this.mesFiltro = mes;
+    this.render();
+  },
+
+  filtrarTipo(tipo) {
+    this.filtroTipo = tipo;
+    document.querySelectorAll('.filtro-tipo-financeiro').forEach(b => {
+      b.classList.toggle('chip--ativo', b.dataset.tipo === tipo);
+    });
+    this.render();
+  },
+
+  preencherSelectCategoria() {
+    const config = ConfigDB.obter();
+    const tipo = document.getElementById('mov-tipo').value || 'Receita';
+    const categorias = tipo === 'Receita' ? config.categoriasReceitas : config.categoriasDespesas;
+    const select = document.getElementById('mov-categoria');
+    const atual = select.value;
+    select.innerHTML = categorias.map(c => `<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`).join('');
+    if (categorias.includes(atual)) select.value = atual;
+  },
+
+  abrirFormulario(id = null) {
+    const mov = id ? FinanceiroDB.buscarPorId(id) : null;
+    const form = document.getElementById('form-financeiro');
+    form.reset();
+    document.getElementById('mov-id').value = mov ? mov.id : '';
+    document.getElementById('modal-financeiro-titulo').textContent = mov ? 'Editar movimentação' : 'Nova movimentação';
+    document.getElementById('mov-tipo').value = mov ? mov.tipo : 'Receita';
+    this.preencherSelectCategoria();
+
+    if (mov) {
+      document.getElementById('mov-categoria').value = mov.categoria || '';
+      document.getElementById('mov-descricao').value = mov.descricao || '';
+      document.getElementById('mov-valor').value = mov.valor || '';
+      document.getElementById('mov-data').value = mov.data || '';
+    } else {
+      document.getElementById('mov-data').value = hojeISO();
+    }
+
+    abrirModal('modal-financeiro');
+  },
+
+  salvar(event) {
+    event.preventDefault();
+
+    const valor = parseValorMonetario(document.getElementById('mov-valor').value);
+    if (valor <= 0) { mostrarToast('O valor deve ser maior que zero.', 'erro'); return; }
+
+    const data = document.getElementById('mov-data').value;
+    if (!data) { mostrarToast('Informe a data.', 'erro'); return; }
+
+    const mov = {
+      id: document.getElementById('mov-id').value || null,
+      tipo: document.getElementById('mov-tipo').value,
+      categoria: document.getElementById('mov-categoria').value,
+      descricao: document.getElementById('mov-descricao').value.trim(),
+      valor,
+      data
+    };
+
+    FinanceiroDB.salvar(mov);
+    fecharModal('modal-financeiro');
+    mostrarToast('Movimentação salva com sucesso.');
+    this.render();
+  },
+
+  async excluir(id) {
+    const confirmado = await confirmarAcao(
+      'Excluir movimentação?',
+      'Tem certeza que deseja excluir este lançamento financeiro? Essa ação não pode ser desfeita.'
+    );
+    if (!confirmado) return;
+    FinanceiroDB.excluir(id);
+    mostrarToast('Movimentação excluída.');
+    this.render();
+  }
+};
+
+
+/* ==========================================================================
+   ORCAMENTO.JS — Calculadora de orçamento
+   Só calcula um valor sugerido se os preços tiverem sido configurados
+   em Configurações. Nenhum preço é inventado pelo sistema.
+   ========================================================================== */
+
+const Orcamento = {
+  render() {
+    const config = ConfigDB.obter();
+    const precosConfigurados = config.precos.valorM2 || config.precos.valorComodo || config.precos.valorBanheiro;
+    const aviso = document.getElementById('orcamento-aviso-precos');
+
+    if (!precosConfigurados) {
+      aviso.style.display = 'flex';
+      aviso.innerHTML = `⚠️ Você ainda não configurou os preços do orçamento.
+        <a href="#configuracoes" class="link" data-secao="configuracoes" onclick="navegarPara('configuracoes')">Configurar agora</a>`;
+    } else {
+      aviso.style.display = 'none';
+    }
+
+    document.getElementById('resultado-orcamento').innerHTML = '';
+  },
+
+  calcular(event) {
+    event.preventDefault();
+    const config = ConfigDB.obter();
+    const precos = config.precos;
+
+    if (!precos.valorM2 && !precos.valorComodo && !precos.valorBanheiro) {
+      mostrarToast('Configure os preços em "Configurações" antes de calcular um orçamento.', 'erro');
+      return;
+    }
+
+    const tamanho = parseFloat(document.getElementById('orc-tamanho').value) || 0;
+    const comodos = parseInt(document.getElementById('orc-comodos').value) || 0;
+    const banheiros = parseInt(document.getElementById('orc-banheiros').value) || 0;
+    const tipoLimpeza = document.getElementById('orc-tipo-limpeza').value;
+    const tipoImovel = document.getElementById('orc-tipo-imovel').value;
+
+    let valorBase = 0;
+    let detalhes = [];
+
+    if (precos.valorM2 && tamanho > 0) {
+      const parcela = tamanho * precos.valorM2;
+      valorBase += parcela;
+      detalhes.push(`${tamanho} m² × ${formatarMoeda(precos.valorM2)} = ${formatarMoeda(parcela)}`);
+    }
+    if (precos.valorComodo && comodos > 0) {
+      const parcela = comodos * precos.valorComodo;
+      valorBase += parcela;
+      detalhes.push(`${comodos} cômodo(s) × ${formatarMoeda(precos.valorComodo)} = ${formatarMoeda(parcela)}`);
+    }
+    if (precos.valorBanheiro && banheiros > 0) {
+      const parcela = banheiros * precos.valorBanheiro;
+      valorBase += parcela;
+      detalhes.push(`${banheiros} banheiro(s) × ${formatarMoeda(precos.valorBanheiro)} = ${formatarMoeda(parcela)}`);
+    }
+
+    if (valorBase === 0) {
+      mostrarToast('Preencha ao menos um campo com preço configurado (m², cômodos ou banheiros).', 'erro');
+      return;
+    }
+
+    const multiplicador = precos.multiplicadores[tipoLimpeza] || 1;
+    const valorFinal = valorBase * multiplicador;
+
+    const resultado = document.getElementById('resultado-orcamento');
+    resultado.innerHTML = `
+      <div class="card-resultado-orcamento">
+        <span class="card-resultado-orcamento__rotulo">Valor sugerido</span>
+        <span class="card-resultado-orcamento__valor">${formatarMoeda(valorFinal)}</span>
+        <div class="card-resultado-orcamento__detalhes">
+          <p><strong>Imóvel:</strong> ${escapeHTML(tipoImovel)}</p>
+          ${detalhes.map(d => `<p>${d}</p>`).join('')}
+          ${multiplicador !== 1 ? `<p><strong>Ajuste por tipo de limpeza (${escapeHTML(tipoLimpeza)}):</strong> ×${multiplicador}</p>` : ''}
+        </div>
+      </div>`;
+  }
+};
+
+
+/* ==========================================================================
+   RELATORIOS.JS — Relatórios mensais
+   ========================================================================== */
+
+const Relatorios = {
+  mesFiltro: '',
+
+  render() {
+    this.mesFiltro = this.mesFiltro || mesAtualISO();
+    document.getElementById('relatorio-filtro-mes').value = this.mesFiltro;
+
+    const mov = FinanceiroDB.listar().filter(m => m.data && m.data.startsWith(this.mesFiltro));
+    const servicos = ServicosDB.listar().filter(s => s.data && s.data.startsWith(this.mesFiltro));
+    const clientes = ClientesDB.listar();
+
+    const faturamento = mov.filter(m => m.tipo === 'Receita').reduce((s, m) => s + m.valor, 0);
+    const despesas = mov.filter(m => m.tipo === 'Despesa').reduce((s, m) => s + m.valor, 0);
+    const lucro = faturamento - despesas;
+
+    const concluidos = servicos.filter(s => s.status === 'Concluído').length;
+    const cancelados = servicos.filter(s => s.status === 'Cancelado').length;
+    const clientesNovos = clientes.filter(c => c.criadoEm && c.criadoEm.startsWith(this.mesFiltro)).length;
+
+    document.getElementById('relatorio-grid').innerHTML = `
+      ${this.card('Faturamento', formatarMoeda(faturamento), '💰')}
+      ${this.card('Despesas', formatarMoeda(despesas), '📉')}
+      ${this.card('Lucro', formatarMoeda(lucro), '📈', lucro < 0)}
+      ${this.card('Serviços no mês', servicos.length, '🧹')}
+      ${this.card('Serviços concluídos', concluidos, '✅')}
+      ${this.card('Serviços cancelados', cancelados, '❌')}
+      ${this.card('Clientes novos', clientesNovos, '🆕')}
+    `;
+  },
+
+  card(titulo, valor, icone, negativo = false) {
+    return `<div class="card-relatorio">
+      <span class="card-relatorio__icone">${icone}</span>
+      <div>
+        <span class="card-relatorio__titulo">${titulo}</span>
+        <span class="card-relatorio__valor ${negativo ? 'valor--negativo' : ''}">${valor}</span>
+      </div>
+    </div>`;
+  },
+
+  filtrarMes(mes) {
+    this.mesFiltro = mes;
+    this.render();
+  }
+};
+
+
+/* ==========================================================================
+   CONFIGURACOES.JS — Dados da empresa, preços do orçamento e categorias
+   ========================================================================== */
+
+const Configuracoes = {
+  render() {
+    const config = ConfigDB.obter();
+
+    document.getElementById('config-nome-empresa').value = config.empresa.nome || '';
+    document.getElementById('config-telefone').value = config.empresa.telefone || '';
+    document.getElementById('config-endereco').value = config.empresa.endereco || '';
+
+    document.getElementById('config-preco-m2').value = config.precos.valorM2 || '';
+    document.getElementById('config-preco-comodo').value = config.precos.valorComodo || '';
+    document.getElementById('config-preco-banheiro').value = config.precos.valorBanheiro || '';
+    document.getElementById('config-mult-pesada').value = config.precos.multiplicadores.pesada || '';
+    document.getElementById('config-mult-pos-obra').value = config.precos.multiplicadores.pos_obra || '';
+
+    this.renderCategorias('categoriasReceitas', 'lista-categorias-receitas');
+    this.renderCategorias('categoriasDespesas', 'lista-categorias-despesas');
+  },
+
+  renderCategorias(chave, idContainer) {
+    const config = ConfigDB.obter();
+    const categorias = config[chave] || [];
+    const container = document.getElementById(idContainer);
+
+    if (categorias.length === 0) {
+      container.innerHTML = '<p class="texto-fraco">Nenhuma categoria cadastrada.</p>';
+      return;
+    }
+
+    container.innerHTML = categorias.map((c, i) => `
+      <span class="tag">
+        ${escapeHTML(c)}
+        <button type="button" class="tag__remover" data-chave="${chave}" data-indice="${i}" title="Remover categoria">×</button>
+      </span>
+    `).join('');
+
+    container.querySelectorAll('.tag__remover').forEach(btn => {
+      btn.addEventListener('click', () => this.removerCategoria(btn.dataset.chave, parseInt(btn.dataset.indice)));
+    });
+  },
+
+  adicionarCategoria(chave, idInput) {
+    const input = document.getElementById(idInput);
+    const valor = input.value.trim();
+    if (!valor) return;
+
+    const config = ConfigDB.obter();
+    if (config[chave].some(c => c.toLowerCase() === valor.toLowerCase())) {
+      mostrarToast('Essa categoria já existe.', 'erro');
+      return;
+    }
+    config[chave].push(valor);
+    ConfigDB.salvar(config);
+    input.value = '';
+    this.renderCategorias(chave, chave === 'categoriasReceitas' ? 'lista-categorias-receitas' : 'lista-categorias-despesas');
+    mostrarToast('Categoria adicionada.');
+  },
+
+  async removerCategoria(chave, indice) {
+    const confirmado = await confirmarAcao('Remover categoria?', 'Movimentações já lançadas com essa categoria não serão alteradas.');
+    if (!confirmado) return;
+    const config = ConfigDB.obter();
+    config[chave].splice(indice, 1);
+    ConfigDB.salvar(config);
+    this.renderCategorias(chave, chave === 'categoriasReceitas' ? 'lista-categorias-receitas' : 'lista-categorias-despesas');
+    mostrarToast('Categoria removida.');
+  },
+
+  salvarEmpresa(event) {
+    event.preventDefault();
+    const config = ConfigDB.obter();
+    config.empresa.nome = document.getElementById('config-nome-empresa').value.trim() || 'Toque Final Limpeza';
+    config.empresa.telefone = document.getElementById('config-telefone').value.trim();
+    config.empresa.endereco = document.getElementById('config-endereco').value.trim();
+    ConfigDB.salvar(config);
+    aplicarNomeEmpresa();
+    mostrarToast('Dados da empresa salvos.');
+  },
+
+  salvarPrecos(event) {
+    event.preventDefault();
+    const config = ConfigDB.obter();
+
+    const m2 = parseValorMonetario(document.getElementById('config-preco-m2').value);
+    const comodo = parseValorMonetario(document.getElementById('config-preco-comodo').value);
+    const banheiro = parseValorMonetario(document.getElementById('config-preco-banheiro').value);
+    const multPesada = parseFloat(document.getElementById('config-mult-pesada').value) || 1;
+    const multPosObra = parseFloat(document.getElementById('config-mult-pos-obra').value) || 1;
+
+    if (m2 < 0 || comodo < 0 || banheiro < 0) {
+      mostrarToast('Os preços não podem ser negativos.', 'erro');
+      return;
+    }
+
+    config.precos.valorM2 = m2 || null;
+    config.precos.valorComodo = comodo || null;
+    config.precos.valorBanheiro = banheiro || null;
+    config.precos.multiplicadores.pesada = multPesada;
+    config.precos.multiplicadores.pos_obra = multPosObra;
+
+    ConfigDB.salvar(config);
+    mostrarToast('Preços do orçamento salvos.');
+  }
+};
+
+</script>
+</body>
+</html>
