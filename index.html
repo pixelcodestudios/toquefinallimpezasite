@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Toque Final Limpeza — Painel Administrativo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ===================== OVERLAY DO MENU MOBILE ===================== -->
+<div id="overlay-menu" class="overlay-menu"></div>
+
+<!-- ===================== MENU LATERAL ===================== -->
+<aside id="menu-lateral" class="menu-lateral">
+  <div class="menu-lateral__topo">
+    <div class="logo">
+      <span class="logo__icone">✦</span>
+      <div class="logo__texto">
+        <strong class="js-nome-empresa">Toque Final Limpeza</strong>
+        <span>Painel administrativo</span>
+      </div>
+    </div>
+  </div>
+
+  <nav class="menu-lateral__nav">
+    <a href="#dashboard" class="nav-link" data-secao="dashboard"><span class="nav-link__icone">🏠</span>Dashboard</a>
+    <a href="#clientes" class="nav-link" data-secao="clientes"><span class="nav-link__icone">👥</span>Clientes</a>
+    <a href="#servicos" class="nav-link" data-secao="servicos"><span class="nav-link__icone">📅</span>Serviços / Agenda</a>
+    <a href="#funcionarios" class="nav-link" data-secao="funcionarios"><span class="nav-link__icone">🧑‍🤝‍🧑</span>Funcionários</a>
+    <a href="#financeiro" class="nav-link" data-secao="financeiro"><span class="nav-link__icone">💰</span>Financeiro</a>
+    <a href="#orcamento" class="nav-link" data-secao="orcamento"><span class="nav-link__icone">🧮</span>Orçamento</a>
+    <a href="#relatorios" class="nav-link" data-secao="relatorios"><span class="nav-link__icone">📊</span>Relatórios</a>
+    <a href="#configuracoes" class="nav-link" data-secao="configuracoes"><span class="nav-link__icone">⚙️</span>Configurações</a>
+  </nav>
+
+  <div class="menu-lateral__rodape">
+    <span>Todos os dados ficam salvos neste navegador.</span>
+  </div>
+</aside>
+
+<!-- ===================== CONTEÚDO PRINCIPAL ===================== -->
+<div class="conteudo-principal">
+
+  <!-- Cabeçalho mobile -->
+  <header class="cabecalho-mobile">
+    <button id="btn-abrir-menu" class="btn-icone-menu" aria-label="Abrir menu">☰</button>
+    <div class="cabecalho-mobile__logo">
+      <span class="logo__icone">✦</span>
+      <strong class="js-nome-empresa">Toque Final Limpeza</strong>
+    </div>
+  </header>
+
+  <main class="area-secoes">
+
+    <!-- ===================== DASHBOARD ===================== -->
+    <section id="secao-dashboard" class="secao">
+      <div class="secao__cabecalho">
+        <div>
+          <h1>Dashboard</h1>
+          <p class="secao__subtitulo">Visão geral do mês atual</p>
+        </div>
+      </div>
+
+      <div class="grid-cards">
+        <div class="card-indicador">
+          <span class="card-indicador__rotulo">Faturamento do mês</span>
+          <span id="dash-faturamento" class="card-indicador__valor">R$ 0,00</span>
+        </div>
+        <div class="card-indicador">
+          <span class="card-indicador__rotulo">Despesas do mês</span>
+          <span id="dash-despesas" class="card-indicador__valor">R$ 0,00</span>
+        </div>
+        <div class="card-indicador card-indicador--destaque">
+          <span class="card-indicador__rotulo">Lucro estimado</span>
+          <span id="dash-lucro" class="card-indicador__valor">R$ 0,00</span>
+        </div>
+        <div class="card-indicador">
+          <span class="card-indicador__rotulo">Clientes ativos</span>
+          <span id="dash-clientes" class="card-indicador__valor">0</span>
+        </div>
+        <div class="card-indicador">
+          <span class="card-indicador__rotulo">Serviços concluídos (mês)</span>
+          <span id="dash-concluidos" class="card-indicador__valor">0</span>
+        </div>
+        <div class="card-indicador">
+          <span class="card-indicador__rotulo">Serviços pendentes</span>
+          <span id="dash-pendentes" class="card-indicador__valor">0</span>
+        </div>
+      </div>
+
+      <div class="grid-duas-colunas">
+        <div class="painel">
+          <h2 class="painel__titulo">Faturamento — últimos 6 meses</h2>
+          <canvas id="grafico-faturamento"></canvas>
+        </div>
+
+        <div class="painel">
+          <h2 class="painel__titulo">Próximos serviços</h2>
+          <div id="dash-proximos-servicos"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== CLIENTES ===================== -->
+    <section id="secao-clientes" class="secao">
+      <div class="secao__cabecalho">
+        <div>
+          <h1>Clientes</h1>
+          <p id="contador-clientes" class="secao__subtitulo">0 clientes cadastrados</p>
+        </div>
+        <button class="btn btn--primario" onclick="Clientes.abrirFormulario()">+ Adicionar cliente</button>
+      </div>
+
+      <div class="barra-filtros">
+        <input type="search" class="campo-busca" placeholder="Buscar por nome ou telefone..." oninput="Clientes.buscar(this.value)">
+      </div>
+
+      <div id="lista-clientes"></div>
+    </section>
+
+    <!-- ===================== SERVIÇOS / AGENDA ===================== -->
+    <section id="secao-servicos" class="secao">
+      <div class="secao__cabecalho">
+        <div>
+          <h1>Serviços / Agenda</h1>
+          <p class="secao__subtitulo">Controle os serviços agendados, concluídos e cancelados</p>
+        </div>
+        <button class="btn btn--primario" onclick="Servicos.abrirFormulario()">+ Agendar serviço</button>
+      </div>
+
+      <div class="barra-filtros">
+        <button class="chip chip--ativo filtro-status-servico" data-status="todos" onclick="Servicos.filtrar('todos')">Todos</button>
+        <button class="chip filtro-status-servico" data-status="Agendado" onclick="Servicos.filtrar('Agendado')">Agendados</button>
+        <button class="chip filtro-status-servico" data-status="Pendente" onclick="Servicos.filtrar('Pendente')">Pendentes</button>
+        <button class="chip filtro-status-servico" data-status="Concluído" onclick="Servicos.filtrar('Concluído')">Concluídos</button>
+        <button class="chip filtro-status-servico" data-status="Cancelado" onclick="Servicos.filtrar('Cancelado')">Cancelados</button>
+      </div>
+
+      <div id="lista-servicos"></div>
+    </section>
+
+    <!-- ===================== FUNCIONÁRIOS ===================== -->
+    <section id="secao-funcionarios" class="secao">
+      <div class="secao__cabecalho">
+        <div>
+          <h1>Funcionários</h1>
+          <p class="secao__subtitulo">Equipe de limpeza</p>
+        </div>
+        <button class="btn btn--primario" onclick="Funcionarios.abrirFormulario()">+ Adicionar funcionário</button>
+      </div>
+
+      <div id="lista-funcionarios"></div>
+    </section>
+
+    <!-- ===================== FINANCEIRO ===================== -->
+    <section id="secao-financeiro" class="secao">
+      <div class="secao__cabecalho">
+        <div>
+          <h1>Financeiro</h1>
+          <p class="secao__subtitulo">Receitas, despesas e lucro</p>
+        </div>
+        <button class="btn btn--primario" onclick="Financeiro.abrirFormulario()">+ Nova movimentação</button>
+      </div>
+
+      <div class="grid-cards grid-cards--tres">
+        <div class="card-indicador">
+          <span class="card-indicador__rotulo">Receitas do mês</span>
+          <span id="financeiro-total-receitas" class="card-indicador__valor">R$ 0,00</span>
+        </div>
+        <div class="card-indicador">
+          <span class="card-indicador__rotulo">Despesas do mês</span>
+          <span id="financeiro-total-despesas" class="card-indicador__valor">R$ 0,00</span>
+        </div>
+        <div class="card-indicador card-indicador--destaque">
+          <span class="card-indicador__rotulo">Lucro do mês</span>
+          <span id="financeiro-lucro" class="card-indicador__valor">R$ 0,00</span>
+        </div>
+      </div>
+
+      <div class="barra-filtros">
+        <input type="month" id="financeiro-filtro-mes" class="campo-mes" onchange="Financeiro.filtrarMes(this.value)">
+        <button class="chip chip--ativo filtro-tipo-financeiro" data-tipo="todos" onclick="Financeiro.filtrarTipo('todos')">Todos</button>
+        <button class="chip filtro-tipo-financeiro" data-tipo="Receita" onclick="Financeiro.filtrarTipo('Receita')">Receitas</button>
+        <button class="chip filtro-tipo-financeiro" data-tipo="Despesa" onclick="Financeiro.filtrarTipo('Despesa')">Despesas</button>
+      </div>
+
+      <div id="lista-financeiro"></div>
+    </section>
+
+    <!-- ===================== ORÇAMENTO ===================== -->
+    <section id="secao-orcamento" class="secao">
+      <div class="secao__cabecalho">
+        <div>
+          <h1>Orçamento</h1>
+          <p class="secao__subtitulo">Calculadora para gerar uma sugestão de valor</p>
+        </div>
+      </div>
+
+      <div id="orcamento-aviso-precos" class="aviso"></div>
+
+      <div class="painel painel--formulario">
+        <form id="form-orcamento" onsubmit="Orcamento.calcular(event)">
+          <div class="grid-formulario">
+            <div class="campo">
+              <label for="orc-tipo-imovel">Tipo de imóvel</label>
+              <select id="orc-tipo-imovel">
+                <option>Casa</option>
+                <option>Apartamento</option>
+                <option>Comercial</option>
+                <option>Outro</option>
+              </select>
+            </div>
+            <div class="campo">
+              <label for="orc-tamanho">Tamanho aproximado (m²)</label>
+              <input type="number" id="orc-tamanho" min="0" step="0.1" placeholder="Ex: 80">
+            </div>
+            <div class="campo">
+              <label for="orc-comodos">Quantidade de cômodos</label>
+              <input type="number" id="orc-comodos" min="0" step="1" placeholder="Ex: 4">
+            </div>
+            <div class="campo">
+              <label for="orc-banheiros">Quantidade de banheiros</label>
+              <input type="number" id="orc-banheiros" min="0" step="1" placeholder="Ex: 2">
+            </div>
+            <div class="campo">
+              <label for="orc-tipo-limpeza">Tipo de limpeza</label>
+              <select id="orc-tipo-limpeza">
+                <option value="padrao">Padrão</option>
+                <option value="pesada">Pesada</option>
+                <option value="pos_obra">Pós-obra</option>
+              </select>
+            </div>
+          </div>
+          <div class="campo">
+            <label for="orc-observacoes">Observações</label>
+            <textarea id="orc-observacoes" rows="2" placeholder="Detalhes adicionais sobre o imóvel ou o serviço"></textarea>
+          </div>
+          <button type="submit" class="btn btn--primario">Calcular orçamento</button>
+        </form>
+      </div>
+
+      <div id="resultado-orcamento"></div>
+    </section>
+
+    <!-- ===================== RELATÓRIOS ===================== -->
+    <section id="secao-relatorios" class="secao">
+      <div class="secao__cabecalho">
+        <div>
+          <h1>Relatórios</h1>
+          <p class="secao__subtitulo">Resumo mensal do negócio</p>
+        </div>
+      </div>
+
+      <div class="barra-filtros">
+        <input type="month" id="relatorio-filtro-mes" class="campo-mes" onchange="Relatorios.filtrarMes(this.value)">
+      </div>
+
+      <div id="relatorio-grid" class="grid-relatorio"></div>
+    </section>
+
+    <!-- ===================== CONFIGURAÇÕES ===================== -->
+    <section id="secao-configuracoes" class="secao">
+      <div class="secao__cabecalho">
+        <div>
+          <h1>Configurações</h1>
+          <p class="secao__subtitulo">Dados da empresa, preços e categorias</p>
+        </div>
+      </div>
+
+      <div class="grid-duas-colunas">
+        <div class="painel painel--formulario">
+          <h2 class="painel__titulo">Dados da empresa</h2>
+          <form id="form-config-empresa" onsubmit="Configuracoes.salvarEmpresa(event)">
+            <div class="campo">
+              <label for="config-nome-empresa">Nome da empresa</label>
+              <input type="text" id="config-nome-empresa" required>
+            </div>
+            <div class="campo">
+              <label for="config-telefone">Telefone</label>
+              <input type="tel" id="config-telefone" placeholder="(00) 00000-0000">
+            </div>
+            <div class="campo">
+              <label for="config-endereco">Endereço</label>
+              <input type="text" id="config-endereco">
+            </div>
+            <button type="submit" class="btn btn--primario">Salvar dados da empresa</button>
+          </form>
+        </div>
+
+        <div class="painel painel--formulario">
+          <h2 class="painel__titulo">Preços usados no orçamento</h2>
+          <p class="texto-fraco">Preencha ao menos um preço-base. Deixe em branco o que não usar.</p>
+          <form id="form-config-precos" onsubmit="Configuracoes.salvarPrecos(event)">
+            <div class="grid-formulario">
+              <div class="campo">
+                <label for="config-preco-m2">Valor por m² (R$)</label>
+                <input type="number" id="config-preco-m2" min="0" step="0.01">
+              </div>
+              <div class="campo">
+                <label for="config-preco-comodo">Valor por cômodo (R$)</label>
+                <input type="number" id="config-preco-comodo" min="0" step="0.01">
+              </div>
+              <div class="campo">
+                <label for="config-preco-banheiro">Valor por banheiro (R$)</label>
+                <input type="number" id="config-preco-banheiro" min="0" step="0.01">
+              </div>
+              <div class="campo">
+                <label for="config-mult-pesada">Multiplicador — limpeza pesada</label>
+                <input type="number" id="config-mult-pesada" min="1" step="0.1">
+              </div>
+              <div class="campo">
+                <label for="config-mult-pos-obra">Multiplicador — pós-obra</label>
+                <input type="number" id="config-mult-pos-obra" min="1" step="0.1">
+              </div>
+            </div>
+            <button type="submit" class="btn btn--primario">Salvar preços</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="grid-duas-colunas">
+        <div class="painel">
+          <h2 class="painel__titulo">Categorias de receitas</h2>
+          <div class="linha-adicionar-tag">
+            <input type="text" id="nova-categoria-receita" placeholder="Nova categoria de receita">
+            <button class="btn btn--secundario" onclick="Configuracoes.adicionarCategoria('categoriasReceitas', 'nova-categoria-receita')">Adicionar</button>
+          </div>
+          <div id="lista-categorias-receitas" class="lista-tags"></div>
+        </div>
+
+        <div class="painel">
+          <h2 class="painel__titulo">Categorias de despesas</h2>
+          <div class="linha-adicionar-tag">
+            <input type="text" id="nova-categoria-despesa" placeholder="Nova categoria de despesa">
+            <button class="btn btn--secundario" onclick="Configuracoes.adicionarCategoria('categoriasDespesas', 'nova-categoria-despesa')">Adicionar</button>
+          </div>
+          <div id="lista-categorias-despesas" class="lista-tags"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ===================== MENU INFERIOR MOBILE ===================== -->
+<nav class="menu-inferior-mobile">
+  <a href="#dashboard" class="nav-link" data-secao="dashboard"><span>🏠</span>Início</a>
+  <a href="#clientes" class="nav-link" data-secao="clientes"><span>👥</span>Clientes</a>
+  <a href="#servicos" class="nav-link" data-secao="servicos"><span>📅</span>Agenda</a>
+  <a href="#financeiro" class="nav-link" data-secao="financeiro"><span>💰</span>Financeiro</a>
+  <a href="#configuracoes" class="nav-link" data-secao="configuracoes"><span>⚙️</span>Ajustes</a>
+</nav>
+
+<!-- ===================== TOASTS ===================== -->
+<div id="toast-container" class="toast-container"></div>
+
+<!-- ===================== MODAL DE CONFIRMAÇÃO ===================== -->
+<div id="modal-confirmacao" class="modal">
+  <div class="modal__caixa modal__caixa--pequena">
+    <h3 class="modal__titulo">Confirmar ação?</h3>
+    <p class="modal__descricao">Tem certeza?</p>
+    <div class="modal__acoes">
+      <button id="btn-cancelar-acao" class="btn btn--secundario">Cancelar</button>
+      <button id="btn-confirmar-acao" class="btn btn--perigo">Excluir</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL: CLIENTE (formulário) ===================== -->
+<div id="modal-cliente" class="modal">
+  <div class="modal__caixa">
+    <div class="modal__cabecalho">
+      <h3 id="modal-cliente-titulo">Novo cliente</h3>
+      <button class="modal__fechar" data-fechar-modal="modal-cliente">×</button>
+    </div>
+    <form id="form-cliente" onsubmit="Clientes.salvar(event)">
+      <input type="hidden" id="cliente-id">
+      <div class="grid-formulario">
+        <div class="campo campo--largo">
+          <label for="cliente-nome">Nome *</label>
+          <input type="text" id="cliente-nome" required>
+        </div>
+        <div class="campo">
+          <label for="cliente-telefone">Telefone</label>
+          <input type="tel" id="cliente-telefone" placeholder="(00) 00000-0000">
+        </div>
+        <div class="campo">
+          <label for="cliente-valor">Valor do serviço (R$)</label>
+          <input type="number" id="cliente-valor" min="0" step="0.01">
+        </div>
+        <div class="campo campo--largo">
+          <label for="cliente-endereco">Endereço</label>
+          <input type="text" id="cliente-endereco">
+        </div>
+        <div class="campo">
+          <label for="cliente-frequencia">Frequência</label>
+          <select id="cliente-frequencia">
+            <option>Semanal</option>
+            <option>Quinzenal</option>
+            <option>Mensal</option>
+            <option>Avulso</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label for="cliente-status">Status</label>
+          <select id="cliente-status">
+            <option>Ativo</option>
+            <option>Inativo</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label for="cliente-ultima-limpeza">Data da última limpeza</label>
+          <input type="date" id="cliente-ultima-limpeza">
+        </div>
+        <div class="campo">
+          <label for="cliente-proxima-limpeza">Próxima limpeza</label>
+          <input type="date" id="cliente-proxima-limpeza">
+        </div>
+      </div>
+      <div class="campo">
+        <label for="cliente-observacoes">Observações</label>
+        <textarea id="cliente-observacoes" rows="2"></textarea>
+      </div>
+      <div class="modal__acoes">
+        <button type="button" class="btn btn--secundario" data-fechar-modal="modal-cliente">Cancelar</button>
+        <button type="submit" class="btn btn--primario">Salvar cliente</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===================== MODAL: DETALHES DO CLIENTE ===================== -->
+<div id="modal-detalhes-cliente" class="modal">
+  <div class="modal__caixa">
+    <div class="modal__cabecalho">
+      <h3>Detalhes do cliente</h3>
+      <button class="modal__fechar" data-fechar-modal="modal-detalhes-cliente">×</button>
+    </div>
+    <div id="detalhes-cliente-corpo"></div>
+    <div class="modal__acoes">
+      <button type="button" class="btn btn--secundario" data-fechar-modal="modal-detalhes-cliente">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL: SERVIÇO ===================== -->
+<div id="modal-servico" class="modal">
+  <div class="modal__caixa">
+    <div class="modal__cabecalho">
+      <h3 id="modal-servico-titulo">Agendar serviço</h3>
+      <button class="modal__fechar" data-fechar-modal="modal-servico">×</button>
+    </div>
+    <form id="form-servico" onsubmit="Servicos.salvar(event)">
+      <input type="hidden" id="servico-id">
+      <div class="grid-formulario">
+        <div class="campo campo--largo">
+          <label for="servico-cliente">Cliente *</label>
+          <select id="servico-cliente" required onchange="Servicos.aoSelecionarCliente()"></select>
+        </div>
+        <div class="campo">
+          <label for="servico-data">Data *</label>
+          <input type="date" id="servico-data" required>
+        </div>
+        <div class="campo">
+          <label for="servico-horario">Horário</label>
+          <input type="time" id="servico-horario">
+        </div>
+        <div class="campo">
+          <label for="servico-funcionario">Funcionário responsável</label>
+          <select id="servico-funcionario"></select>
+        </div>
+        <div class="campo">
+          <label for="servico-valor">Valor (R$)</label>
+          <input type="number" id="servico-valor" min="0" step="0.01">
+        </div>
+        <div class="campo">
+          <label for="servico-status">Status</label>
+          <select id="servico-status">
+            <option>Agendado</option>
+            <option>Pendente</option>
+            <option>Concluído</option>
+            <option>Cancelado</option>
+          </select>
+        </div>
+      </div>
+      <div class="campo">
+        <label for="servico-observacoes">Observações</label>
+        <textarea id="servico-observacoes" rows="2"></textarea>
+      </div>
+      <div class="modal__acoes">
+        <button type="button" class="btn btn--secundario" data-fechar-modal="modal-servico">Cancelar</button>
+        <button type="submit" class="btn btn--primario">Salvar serviço</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===================== MODAL: FUNCIONÁRIO ===================== -->
+<div id="modal-funcionario" class="modal">
+  <div class="modal__caixa">
+    <div class="modal__cabecalho">
+      <h3 id="modal-funcionario-titulo">Novo funcionário</h3>
+      <button class="modal__fechar" data-fechar-modal="modal-funcionario">×</button>
+    </div>
+    <form id="form-funcionario" onsubmit="Funcionarios.salvar(event)">
+      <input type="hidden" id="funcionario-id">
+      <div class="grid-formulario">
+        <div class="campo campo--largo">
+          <label for="funcionario-nome">Nome *</label>
+          <input type="text" id="funcionario-nome" required>
+        </div>
+        <div class="campo">
+          <label for="funcionario-telefone">Telefone</label>
+          <input type="tel" id="funcionario-telefone" placeholder="(00) 00000-0000">
+        </div>
+        <div class="campo">
+          <label for="funcionario-forma-pagamento">Forma de pagamento</label>
+          <input type="text" id="funcionario-forma-pagamento" placeholder="Ex: Pix, diária, mensal">
+        </div>
+        <div class="campo">
+          <label for="funcionario-valor">Valor recebido (R$)</label>
+          <input type="number" id="funcionario-valor" min="0" step="0.01">
+        </div>
+      </div>
+      <div class="campo">
+        <label for="funcionario-observacoes">Observações</label>
+        <textarea id="funcionario-observacoes" rows="2"></textarea>
+      </div>
+      <div class="modal__acoes">
+        <button type="button" class="btn btn--secundario" data-fechar-modal="modal-funcionario">Cancelar</button>
+        <button type="submit" class="btn btn--primario">Salvar funcionário</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===================== MODAL: MOVIMENTAÇÃO FINANCEIRA ===================== -->
+<div id="modal-financeiro" class="modal">
+  <div class="modal__caixa">
+    <div class="modal__cabecalho">
+      <h3 id="modal-financeiro-titulo">Nova movimentação</h3>
+      <button class="modal__fechar" data-fechar-modal="modal-financeiro">×</button>
+    </div>
+    <form id="form-financeiro" onsubmit="Financeiro.salvar(event)">
+      <input type="hidden" id="mov-id">
+      <div class="grid-formulario">
+        <div class="campo">
+          <label for="mov-tipo">Tipo *</label>
+          <select id="mov-tipo" onchange="Financeiro.preencherSelectCategoria()">
+            <option>Receita</option>
+            <option>Despesa</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label for="mov-categoria">Categoria *</label>
+          <select id="mov-categoria" required></select>
+        </div>
+        <div class="campo">
+          <label for="mov-valor">Valor (R$) *</label>
+          <input type="number" id="mov-valor" min="0.01" step="0.01" required>
+        </div>
+        <div class="campo">
+          <label for="mov-data">Data *</label>
+          <input type="date" id="mov-data" required>
+        </div>
+        <div class="campo campo--largo">
+          <label for="mov-descricao">Descrição</label>
+          <input type="text" id="mov-descricao">
+        </div>
+      </div>
+      <div class="modal__acoes">
+        <button type="button" class="btn btn--secundario" data-fechar-modal="modal-financeiro">Cancelar</button>
+        <button type="submit" class="btn btn--primario">Salvar movimentação</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="js/storage.js"></script>
+<script src="js/app.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/clientes.js"></script>
+<script src="js/servicos.js"></script>
+<script src="js/funcionarios.js"></script>
+<script src="js/financeiro.js"></script>
+<script src="js/orcamento.js"></script>
+<script src="js/relatorios.js"></script>
+<script src="js/configuracoes.js"></script>
+</body>
+</html>
