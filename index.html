@@ -303,6 +303,11 @@ a { color: inherit; text-decoration: none; }
   border: 1px solid #fcd34d; border-radius: var(--raio-sm); padding: 12px 16px; font-size: 13.5px; margin-bottom: 18px;
 }
 .aviso .link { font-weight: 700; text-decoration: underline; }
+.aviso--info {
+  display: flex; background: var(--jade-50); color: var(--jade-800); border-color: var(--jade-500);
+}
+
+.card-resultado-orcamento--estatico { margin-top: 12px; padding: 18px 22px; }
 
 /* ---------------- Orçamento: resultado ---------------- */
 
@@ -651,7 +656,7 @@ a { color: inherit; text-decoration: none; }
         </div>
       </div>
 
-      <div id="orcamento-aviso-precos" class="aviso"></div>
+      <div class="aviso aviso--info">ℹ️ Preço fixo: <strong>€10,00 por hora</strong>. O valor do orçamento é sempre horas estimadas × €10.</div>
 
       <div class="painel painel--formulario">
         <form id="form-orcamento" onsubmit="Orcamento.calcular(event)">
@@ -666,24 +671,8 @@ a { color: inherit; text-decoration: none; }
               </select>
             </div>
             <div class="campo">
-              <label for="orc-tamanho">Tamanho aproximado (m²)</label>
-              <input type="number" id="orc-tamanho" min="0" step="0.1" placeholder="Ex: 80">
-            </div>
-            <div class="campo">
-              <label for="orc-comodos">Quantidade de cômodos</label>
-              <input type="number" id="orc-comodos" min="0" step="1" placeholder="Ex: 4">
-            </div>
-            <div class="campo">
-              <label for="orc-banheiros">Quantidade de banheiros</label>
-              <input type="number" id="orc-banheiros" min="0" step="1" placeholder="Ex: 2">
-            </div>
-            <div class="campo">
-              <label for="orc-tipo-limpeza">Tipo de limpeza</label>
-              <select id="orc-tipo-limpeza">
-                <option value="padrao">Padrão</option>
-                <option value="pesada">Pesada</option>
-                <option value="pos_obra">Pós-obra</option>
-              </select>
+              <label for="orc-horas">Horas estimadas *</label>
+              <input type="number" id="orc-horas" min="0.5" step="0.5" placeholder="Ex: 3" required>
             </div>
           </div>
           <div class="campo">
@@ -742,34 +731,13 @@ a { color: inherit; text-decoration: none; }
           </form>
         </div>
 
-        <div class="painel painel--formulario">
-          <h2 class="painel__titulo">Preços usados no orçamento</h2>
-          <p class="texto-fraco">Preencha ao menos um preço-base. Deixe em branco o que não usar.</p>
-          <form id="form-config-precos" onsubmit="Configuracoes.salvarPrecos(event)">
-            <div class="grid-formulario">
-              <div class="campo">
-                <label for="config-preco-m2">Valor por m² (R$)</label>
-                <input type="number" id="config-preco-m2" min="0" step="0.01">
-              </div>
-              <div class="campo">
-                <label for="config-preco-comodo">Valor por cômodo (R$)</label>
-                <input type="number" id="config-preco-comodo" min="0" step="0.01">
-              </div>
-              <div class="campo">
-                <label for="config-preco-banheiro">Valor por banheiro (R$)</label>
-                <input type="number" id="config-preco-banheiro" min="0" step="0.01">
-              </div>
-              <div class="campo">
-                <label for="config-mult-pesada">Multiplicador — limpeza pesada</label>
-                <input type="number" id="config-mult-pesada" min="1" step="0.1">
-              </div>
-              <div class="campo">
-                <label for="config-mult-pos-obra">Multiplicador — pós-obra</label>
-                <input type="number" id="config-mult-pos-obra" min="1" step="0.1">
-              </div>
-            </div>
-            <button type="submit" class="btn btn--primario">Salvar preços</button>
-          </form>
+        <div class="painel">
+          <h2 class="painel__titulo">Preço da limpeza</h2>
+          <p class="texto-fraco">O preço é fixo e calculado automaticamente no Orçamento.</p>
+          <div class="card-resultado-orcamento card-resultado-orcamento--estatico">
+            <span class="card-resultado-orcamento__rotulo">Valor por hora</span>
+            <span class="card-resultado-orcamento__valor">€10,00</span>
+          </div>
         </div>
       </div>
 
@@ -840,7 +808,7 @@ a { color: inherit; text-decoration: none; }
           <input type="tel" id="cliente-telefone" placeholder="(00) 00000-0000">
         </div>
         <div class="campo">
-          <label for="cliente-valor">Valor do serviço (R$)</label>
+          <label for="cliente-valor">Valor do serviço (€)</label>
           <input type="number" id="cliente-valor" min="0" step="0.01">
         </div>
         <div class="campo campo--largo">
@@ -925,7 +893,7 @@ a { color: inherit; text-decoration: none; }
           <select id="servico-funcionario"></select>
         </div>
         <div class="campo">
-          <label for="servico-valor">Valor (R$)</label>
+          <label for="servico-valor">Valor (€)</label>
           <input type="number" id="servico-valor" min="0" step="0.01">
         </div>
         <div class="campo">
@@ -973,7 +941,7 @@ a { color: inherit; text-decoration: none; }
           <input type="text" id="funcionario-forma-pagamento" placeholder="Ex: Pix, diária, mensal">
         </div>
         <div class="campo">
-          <label for="funcionario-valor">Valor recebido (R$)</label>
+          <label for="funcionario-valor">Valor recebido (€)</label>
           <input type="number" id="funcionario-valor" min="0" step="0.01">
         </div>
       </div>
@@ -1011,7 +979,7 @@ a { color: inherit; text-decoration: none; }
           <select id="mov-categoria" required></select>
         </div>
         <div class="campo">
-          <label for="mov-valor">Valor (R$) *</label>
+          <label for="mov-valor">Valor (€) *</label>
           <input type="number" id="mov-valor" min="0.01" step="0.01" required>
         </div>
         <div class="campo">
@@ -1055,16 +1023,7 @@ const CONFIG_PADRAO = {
     telefone: '',
     endereco: ''
   },
-  precos: {
-    valorM2: null,        // R$ por m² (null = não configurado ainda)
-    valorComodo: null,    // R$ por cômodo
-    valorBanheiro: null,  // R$ por banheiro
-    multiplicadores: {    // multiplicador aplicado sobre o valor base, por tipo de limpeza
-      padrao: 1,
-      pesada: 1.4,
-      pos_obra: 1.8
-    }
-  },
+  // Preço da limpeza: fixo em €10 por hora (não configurável, ver PRECO_HORA em orcamento.js)
   categoriasDespesas: ['Produtos de limpeza', 'Transporte', 'Pagamento a funcionários', 'Outras despesas'],
   categoriasReceitas: ['Serviço de limpeza', 'Outras receitas']
 };
@@ -1213,7 +1172,10 @@ const ConfigDB = {
 
 function formatarMoeda(valor) {
   const n = Number(valor) || 0;
-  return n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const sinal = n < 0 ? '-' : '';
+  const partes = Math.abs(n).toFixed(2).split('.');
+  const inteiro = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  return `${sinal}€${inteiro},${partes[1]}`;
 }
 
 /* Converte string "1234,56" ou "1234.56" digitada pelo usuário em número */
@@ -2153,79 +2115,36 @@ const Financeiro = {
 
 /* ==========================================================================
    ORCAMENTO.JS — Calculadora de orçamento
-   Só calcula um valor sugerido se os preços tiverem sido configurados
-   em Configurações. Nenhum preço é inventado pelo sistema.
+   Preço fixo: €10 por hora. Valor total = horas estimadas × €10.
    ========================================================================== */
 
 const Orcamento = {
+  PRECO_HORA: 10,
+
   render() {
-    const config = ConfigDB.obter();
-    const precosConfigurados = config.precos.valorM2 || config.precos.valorComodo || config.precos.valorBanheiro;
-    const aviso = document.getElementById('orcamento-aviso-precos');
-
-    if (!precosConfigurados) {
-      aviso.style.display = 'flex';
-      aviso.innerHTML = `⚠️ Você ainda não configurou os preços do orçamento.
-        <a href="#configuracoes" class="link" data-secao="configuracoes" onclick="navegarPara('configuracoes')">Configurar agora</a>`;
-    } else {
-      aviso.style.display = 'none';
-    }
-
     document.getElementById('resultado-orcamento').innerHTML = '';
   },
 
   calcular(event) {
     event.preventDefault();
-    const config = ConfigDB.obter();
-    const precos = config.precos;
 
-    if (!precos.valorM2 && !precos.valorComodo && !precos.valorBanheiro) {
-      mostrarToast('Configure os preços em "Configurações" antes de calcular um orçamento.', 'erro');
+    const horas = parseFloat(document.getElementById('orc-horas').value);
+    if (!horas || horas <= 0) {
+      mostrarToast('Informe a quantidade de horas estimadas.', 'erro');
       return;
     }
 
-    const tamanho = parseFloat(document.getElementById('orc-tamanho').value) || 0;
-    const comodos = parseInt(document.getElementById('orc-comodos').value) || 0;
-    const banheiros = parseInt(document.getElementById('orc-banheiros').value) || 0;
-    const tipoLimpeza = document.getElementById('orc-tipo-limpeza').value;
     const tipoImovel = document.getElementById('orc-tipo-imovel').value;
-
-    let valorBase = 0;
-    let detalhes = [];
-
-    if (precos.valorM2 && tamanho > 0) {
-      const parcela = tamanho * precos.valorM2;
-      valorBase += parcela;
-      detalhes.push(`${tamanho} m² × ${formatarMoeda(precos.valorM2)} = ${formatarMoeda(parcela)}`);
-    }
-    if (precos.valorComodo && comodos > 0) {
-      const parcela = comodos * precos.valorComodo;
-      valorBase += parcela;
-      detalhes.push(`${comodos} cômodo(s) × ${formatarMoeda(precos.valorComodo)} = ${formatarMoeda(parcela)}`);
-    }
-    if (precos.valorBanheiro && banheiros > 0) {
-      const parcela = banheiros * precos.valorBanheiro;
-      valorBase += parcela;
-      detalhes.push(`${banheiros} banheiro(s) × ${formatarMoeda(precos.valorBanheiro)} = ${formatarMoeda(parcela)}`);
-    }
-
-    if (valorBase === 0) {
-      mostrarToast('Preencha ao menos um campo com preço configurado (m², cômodos ou banheiros).', 'erro');
-      return;
-    }
-
-    const multiplicador = precos.multiplicadores[tipoLimpeza] || 1;
-    const valorFinal = valorBase * multiplicador;
+    const valorTotal = horas * this.PRECO_HORA;
 
     const resultado = document.getElementById('resultado-orcamento');
     resultado.innerHTML = `
       <div class="card-resultado-orcamento">
         <span class="card-resultado-orcamento__rotulo">Valor sugerido</span>
-        <span class="card-resultado-orcamento__valor">${formatarMoeda(valorFinal)}</span>
+        <span class="card-resultado-orcamento__valor">${formatarMoeda(valorTotal)}</span>
         <div class="card-resultado-orcamento__detalhes">
           <p><strong>Imóvel:</strong> ${escapeHTML(tipoImovel)}</p>
-          ${detalhes.map(d => `<p>${d}</p>`).join('')}
-          ${multiplicador !== 1 ? `<p><strong>Ajuste por tipo de limpeza (${escapeHTML(tipoLimpeza)}):</strong> ×${multiplicador}</p>` : ''}
+          <p>${horas} hora(s) × ${formatarMoeda(this.PRECO_HORA)} = ${formatarMoeda(valorTotal)}</p>
         </div>
       </div>`;
   }
@@ -2284,7 +2203,8 @@ const Relatorios = {
 
 
 /* ==========================================================================
-   CONFIGURACOES.JS — Dados da empresa, preços do orçamento e categorias
+   CONFIGURACOES.JS — Dados da empresa e categorias financeiras
+   (o preço do orçamento é fixo em €10/hora, definido em orcamento.js)
    ========================================================================== */
 
 const Configuracoes = {
@@ -2294,12 +2214,6 @@ const Configuracoes = {
     document.getElementById('config-nome-empresa').value = config.empresa.nome || '';
     document.getElementById('config-telefone').value = config.empresa.telefone || '';
     document.getElementById('config-endereco').value = config.empresa.endereco || '';
-
-    document.getElementById('config-preco-m2').value = config.precos.valorM2 || '';
-    document.getElementById('config-preco-comodo').value = config.precos.valorComodo || '';
-    document.getElementById('config-preco-banheiro').value = config.precos.valorBanheiro || '';
-    document.getElementById('config-mult-pesada').value = config.precos.multiplicadores.pesada || '';
-    document.getElementById('config-mult-pos-obra').value = config.precos.multiplicadores.pos_obra || '';
 
     this.renderCategorias('categoriasReceitas', 'lista-categorias-receitas');
     this.renderCategorias('categoriasDespesas', 'lista-categorias-despesas');
@@ -2365,30 +2279,6 @@ const Configuracoes = {
     mostrarToast('Dados da empresa salvos.');
   },
 
-  salvarPrecos(event) {
-    event.preventDefault();
-    const config = ConfigDB.obter();
-
-    const m2 = parseValorMonetario(document.getElementById('config-preco-m2').value);
-    const comodo = parseValorMonetario(document.getElementById('config-preco-comodo').value);
-    const banheiro = parseValorMonetario(document.getElementById('config-preco-banheiro').value);
-    const multPesada = parseFloat(document.getElementById('config-mult-pesada').value) || 1;
-    const multPosObra = parseFloat(document.getElementById('config-mult-pos-obra').value) || 1;
-
-    if (m2 < 0 || comodo < 0 || banheiro < 0) {
-      mostrarToast('Os preços não podem ser negativos.', 'erro');
-      return;
-    }
-
-    config.precos.valorM2 = m2 || null;
-    config.precos.valorComodo = comodo || null;
-    config.precos.valorBanheiro = banheiro || null;
-    config.precos.multiplicadores.pesada = multPesada;
-    config.precos.multiplicadores.pos_obra = multPosObra;
-
-    ConfigDB.salvar(config);
-    mostrarToast('Preços do orçamento salvos.');
-  }
 };
 
 </script>
